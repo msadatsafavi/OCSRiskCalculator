@@ -1,0 +1,36 @@
+---
+title: "Report"
+output: html_document
+date: "2023-05-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(OCSRiskCalculator)
+evidence <- get_evidence()
+```
+
+### Cataract:
+The background incidence of cataract was taken from [Waudby et a](https://doi.org/10.1186/1471-2415-11-32). In particular, their Figure 3 provides KM estimates by age which is helpful!
+
+The values were digitized at 5-year intervals and then were interpolated, resulting in the following table
+
+```{r echo=FALSE}
+
+knitr::kable(evidence$ctc_risk_by_sex_age)
+
+```
+
+
+### Hypertension
+[Robitaile et al](https://doi.org/10.1503/cmaj.101863) provides incidence by age and sex in Canada (see their Figure 3). 
+
+For now I am approsimating the annual incidence by a function {((x-20)/80)^2/10}, which is a good approximation by now (and the incidence is similar between male and female)
+
+```{r echo=FALSE}
+
+knitr::kable(evidence$ctc_risk_by_sex_age)
+
+```
+
