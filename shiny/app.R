@@ -13,8 +13,9 @@ shinyApp(
     ,inputPanel(
        numericInput("age", label="age", min=18, max=80, value=40, width="50%")
       ,radioButtons("female","Gender:", choices=c("Female"=1, "Male"=0))
-      ,radioButtons("cur_ocs","Your current OCS dose:", choices=c("None"=0, "Low dose"=1, "High dose"=2))
-      ,radioButtons("hist_ocs","Your previous OCS dose:", choices=c("None"=0, "Low dose"=1, "High dose"=2))
+      ,radioButtons("cur_ocs","Currently taking OCS:", choices=c("No"=0, "Yes"=1))
+      ,numericInput("ocs_years", label="Number of years taking corticosteroids", min=1, max=30, value=10, width="50%")
+      ,radioButtons("hist_ocs","Generally, your OCS dose has been", choices=c("Low"=0, "High"=1))
       ,submitButton("Calculate!")
     )
     ,mainPanel(
@@ -26,6 +27,7 @@ shinyApp(
 
   server = function(input, output, session)
   {
+
     generate_icon_array <- function(order=c('yellow','red','green'),counts=c(50,30,20))
     {
       x <- c(rep(faces[order[1]],counts[1]),
@@ -58,7 +60,14 @@ shinyApp(
 
     output$test1 <- renderText(input$female)
 
-    get_profile <- reactive({profiile <- c(female=as.integer(input$female), age= as.integer(input$age), cur_ocs=as.integer(input$cur_ocs), hist_ocs=as.integer(input$hist_ocs))})
+    get_profile <- reactive(
+      {
+        profiile <- c(female=as.integer(input$female),
+                      age= as.integer(input$age),
+                      cur_ocs=as.integer(input$cur_ocs),
+                      hist_ocs_low_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==0)),
+                      hist_ocs_high_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==1)))
+      })
 
     output$profile <- renderText(deparse(get_profile()))
 

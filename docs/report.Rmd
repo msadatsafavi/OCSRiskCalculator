@@ -8,17 +8,21 @@ date: "2023-05-27"
 knitr::opts_chunk$set(echo = TRUE)
 
 library(OCSRiskCalculator)
-evidence <- get_evidence()
 ```
+
+## Context
+Shall we look into the future or simply compare the excess risk of someone with a given OCS use profile versus someone who does not? Consider the case of a patient who has been taking OCS for 15 years. Shall we calculate the risk of diabetes in this patient compared with one who has not taking any OCS? Or predict the risk in the next 10 years? The latter assumes the patient does not currently have diabetes. And generally we do not know the risk of diabetes in a patient who has been taking OCS but has not yet developed diabetes. 
+
 
 ### Cataract:
 The background incidence of cataract was taken from [Waudby et a](https://doi.org/10.1186/1471-2415-11-32). In particular, their Figure 3 provides KM estimates by age which is helpful!
 
-The values were digitized at 5-year intervals and then were interpolated, resulting in the following table
+The values were digitized at 5-year intervals and then were interpolated, resulting in the following curves
 
 ```{r echo=FALSE}
-
-knitr::kable(evidence$ctc_risk_by_sex_age)
+plot(evidence$ctc_prevalence_by_sex_age[,1], evidence$ctc_prevalence_by_sex_age[,'male'], col='green', type='l', xlab='Age', ylab='Prevalence')
+lines(evidence$ctc_prevalence_by_sex_age[,1],evidence$ctc_prevalence_by_sex_age[,'female'], type='l', col='blue')
+legend(40,0.7,c('male','female'),col=c('green','blue'), lty = c(1,1))
 
 ```
 
@@ -26,11 +30,31 @@ knitr::kable(evidence$ctc_risk_by_sex_age)
 ### Hypertension
 [Robitaile et al](https://doi.org/10.1503/cmaj.101863) provides incidence by age and sex in Canada (see their Figure 3). 
 
-For now I am approsimating the annual incidence by a function {((x-20)/80)^2/10}, which is a good approximation by now (and the incidence is similar between male and female)
+For now I am approximating the annual incidence by a function {((x-20)/80)^2/10}, which is a good approximation by now (and the incidence is similar between male and female)
 
 ```{r echo=FALSE}
 
-knitr::kable(evidence$ctc_risk_by_sex_age)
+plot(evidence$htn_incidence_by_sex_age[,1], evidence$htn_incidence_by_sex_age[,'male'], col='green', type='l', xlab='Age', ylab='Incidence')
+lines(evidence$htn_incidence_by_sex_age[,1],evidence$htn_incidence_by_sex_age[,'female'], type='l', col='blue')
+legend(40,0.05,c('male','female'),col=c('green','blue'), lty = c(1,1))
+
+
+```
+
+
+
+
+### Fractures
+[Shen et al](https://doi.org/10.3389%2Ffendo.2022.882241) uses GBD data to estimate the GLOBAL prevalence of fractures (see Figure 2 D). 
+
+I have digitized the prevalence (which is really cumulative incidence for fractures) by sex and age from Figure 2-D. 
+
+```{r echo=FALSE}
+
+plot(evidence$frc_prevalence_by_sex_age[,1], evidence$frc_prevalence_by_sex_age[,'female'], col='blue', type='l', xlab='Age', ylab='Prevalence')
+lines(evidence$frc_prevalence_by_sex_age[,1],evidence$frc_prevalence_by_sex_age[,'male'], type='l', col='green')
+legend(40,0.35,c('male','female'),col=c('green','blue'), lty = c(1,1))
+
 
 ```
 
