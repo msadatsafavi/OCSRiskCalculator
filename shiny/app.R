@@ -6,34 +6,62 @@ faces <- c(red='<svg class="red-face" xmlns="http://www.w3.org/2000/svg" viewBox
           yellow='<svg class="yellow-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.yellow-face .cls-1{fill:#eea342;}.yellow-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><circle class="cls-2" cx="6.67" cy="7.92" r="1.81"></circle><circle class="cls-2" cx="14.36" cy="7.92" r="1.81"></circle><path class="cls-2" d="M17.12,14.29A11.46,11.46,0,0,1,4,14.3a.45.45,0,1,0-.53.73,12.42,12.42,0,0,0,7.17,2.23,11.66,11.66,0,0,0,7-2.25.45.45,0,0,0,.09-.63A.46.46,0,0,0,17.12,14.29Z"></path></g></g></svg>')
 
 
+info_div_innerHTML <- "<TABLE style='background-color:gray;width:100%;height:100%'>
+                        <TBODY>
+                          <TR>
+                            <TD></TD>
+                            <TD align='center'>
+                              <SPAN style='border:5px red solid; background-color:orange;'>
+                                More Info
+                              </SPAN>
+                            </TD>
+                            <TD></TD>
+                          </TR>
+                        </TBODY>
+                      </TABLE>"
+
+
 shinyApp(
   ui = fluidPage(
-    #print(paste("Server version: 0.1")),
-    titlePanel("OCS risk calculator")
-    ,inputPanel(
-       numericInput("age", label="age", min=18, max=80, value=40, width="50%")
-      ,radioButtons("female","Gender:", choices=c("Female"=1, "Male"=0))
-      ,radioButtons("cur_ocs","Currently taking OCS:", choices=c("No"=0, "Yes"=1))
-      ,numericInput("ocs_years", label="Number of years taking corticosteroids", min=1, max=30, value=10, width="50%")
-      ,radioButtons("hist_ocs","Generally, your OCS dose has been", choices=c("Low"=0, "High"=1))
-      ,submitButton("Calculate!")
-    )
-    ,mainPanel(
-      textOutput("profile")
-      ,uiOutput("main", inline=TRUE, fill=TRUE)
-    )
+    shinyjs::useShinyjs(),
+    tags$head(
+      tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
+    ),
+    print(paste("Server version: 0.1")),
+    titlePanel("OCS risk calculator"),
+    sidebarLayout(
+      sidebarPanel(
+         numericInput("age", label="age", min=18, max=80, value=40, width="50%")
+        ,radioButtons("female","Gender:", choices=c("Female"=1, "Male"=0))
+        ,radioButtons("cur_ocs","Currently taking OCS:", choices=c("No"=0, "Yes"=1))
+        ,numericInput("ocs_years", label="Number of years taking corticosteroids", min=1, max=30, value=10, width="50%")
+        ,radioButtons("hist_ocs","Generally, your OCS dose has been", choices=c("Low"=0, "High"=1))
+        ,checkboxInput("consent","I understand the risks of using this tool")
+        ,actionButton("calculate","Calculate!")
+        ,actionButton("reset","Restart")
+        ,textOutput("need_to_consent")
+        ,tags$head(tags$style("#need_to_consent{color: red;
+                                 font-style: bold;
+                                 }"
+          )
+        )
+      )
+      ,mainPanel(
+        textOutput("profile")
+        ,uiOutput("main", inline=T)
+      )),
+    tags$script(src="app.js")
   ),
 
 
   server = function(input, output, session)
   {
-
     generate_icon_array <- function(order=c('yellow','red','green'),counts=c(50,30,20))
     {
       x <- c(rep(faces[order[1]],counts[1]),
              rep(faces[order[2]],counts[2]),
              rep(faces[order[3]],counts[3]))
-      out <- "<TABLE style='width:100pt;height=100pt;margin:0;padding:0;float:left'>"
+      out <- "<TABLE style='width:100%;margin:0;padding:0'><TBODY>"
       for(i in 1:10)
       {
         out <- paste(out,"<TR>")
@@ -43,47 +71,89 @@ shinyApp(
         }
         out <- paste(out,"</TR>")
       }
-      out <- paste(out,"</TABLE>")
+      out <- paste(out,"</TBODY></TABLE>")
 
       out
     }
 
+    observeEvent(input$calculate, {
+      if(isolate(input$consent))
+      {
+        for(i in 1:length(outcomes))
+        {
+            output[[paste0("panel_",outcomes[i])]] <- renderUI(HTML(create_res_panel(profile=pfl(), outcome=outcomes[i])))
+        }
+        for(nm in names(input))
+          shinyjs::disable(nm)
+        shinyjs::enable("reset")
+        output$need_to_consent <- renderText("")
+      }
+      else
+      {
+        output$need_to_consent <- renderText("Please consent to use this tool")
+      }
+    })
+
+    observeEvent(input$reset, {
+      for(i in 1:length(outcomes))
+      {
+        output[[paste0("panel_",outcomes[i])]] <- renderUI(HTML(""))
+      }
+      updateCheckboxInput(inputId="consent",value = F)
+      for(nm in names(input))
+        shinyjs::enable(nm)
+      output$need_to_consent <- renderText("")
+    })
+
     create_res_panel <- function(profile, outcome)
     {
+      #input$calculate
       tmp <- round(calculate_risk(profile,outcome)*1000)/10
       tmp_i <- round(tmp)
-      paste0(names(outcomes)[which(outcomes==outcome)],":",tmp[1],"% (from:", tmp[2],"% to:", tmp[3],"%)",generate_icon_array(counts=c(tmp_i[2],tmp_i[1],100-tmp_i[2]-tmp_i[1])))
-      #generate_icon_array()
+      paste0("<DIV id='",outcome,"' onmouseover='mouseOverOutcome(this.id)' onmouseout='mouseExitOutcome(this.id)'>
+                <A href='http://www.sony.com'>
+                  <TABLE style='float:left;border:1px black solid;width:250pt;margin-top: 20px;  margin-bottom: 20px;  margin-right: 20px;  margin-left: 20px;'>
+                    <TBODY>
+                      <TR>
+                        <TD>",names(outcomes)[which(outcomes==outcome)],":",tmp[1],"% (from:", tmp[2],"% to:", tmp[3],"%)
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD>
+                          <DIV style='position:relative;z-index:1'>",
+                            generate_icon_array(counts=c(tmp_i[2],tmp_i[1],100-tmp_i[2]-tmp_i[1])),"
+                            <DIV id='more_info_",outcome,"' style='position:absolute;width:100%;height:100%;top:0;left:0;z-index:10;opacity:0.5;visibility:hidden'>",info_div_innerHTML,"
+                            </DIV>
+                          </DIV>
+                        </TD>
+                      </TR>
+                    </TBODY>
+                  </TABLE>
+                </A>
+             </DIV>")
     }
 
     outcomes <- get_outcomes()
 
-    output$test1 <- renderText(input$female)
+    output$main <- renderUI({
+          panel_output_list <- lapply(outcomes, function(i) {
+            panel_name <- paste0("panel_", i)
+            htmlOutput(panel_name, inline=T, fill=F)})
 
-    get_profile <- reactive(
-      {
-        profiile <- c(female=as.integer(input$female),
-                      age= as.integer(input$age),
-                      cur_ocs=as.integer(input$cur_ocs),
-                      hist_ocs_low_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==0)),
-                      hist_ocs_high_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==1)))
-      })
+          panel_output_list
+    })
 
-    output$profile <- renderText(deparse(get_profile()))
+    pfl <- reactive({
+                 c(female=as.integer(input$female),
+                 age= as.integer(input$age),
+                 cur_ocs=as.integer(input$cur_ocs),
+                 hist_ocs_low_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==0)),
+                 hist_ocs_high_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==1)))
+              })
 
-    output$main <- renderUI(
-      {
-        pf <- get_profile()
+    output$profile <- renderText(pfl())
 
-        res_panels <- list()
-        for(i in 1:length(outcomes))
-        {
-          res_panels[[i]] <- HTML(create_res_panel(pf, outcomes[i]))
-        }
 
-        res_panels
-      }
-    )
     #output$icon_array <- renderText(HTML(generate_icon_array()))
   }
 )

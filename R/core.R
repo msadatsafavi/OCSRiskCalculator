@@ -1,4 +1,4 @@
-outcomes <- c('Fractures'="ost", 'Type 2 diabetes'="dm2", 'Hypertension'="htn", 'Cataracts'="ctc", 'Dyslipidemia'="dlp")
+outcomes <- c('Fractures'="frc", 'Type 2 diabetes'="dm2", 'Hypertension'="htn", 'Cataracts'="ctc", 'Dyslipidemia'="dlp")
 
 evidence <- list(
   ocs_coefficients = list(
@@ -22,8 +22,16 @@ evidence <- list(
    female=cbind(
     age=c(40,45.02381716316608,50.10649850679961,55.05516203075252,60.207814003998315,65.2259545376015,70.443023915887,75.13685613446206,80.1005750672557,85.20818421896979,90.24680998099561),
     incidence=c(0.05211837,0.058819755,0.066970407,0.083879853,0.105137103,0.132238813,0.179764543,0.246201841,0.35199842,0.507322852,0.655369351)
- ))
+ )),
 
+ dm2_prevalence_by_race_raw=cbind(
+   age=seq(10,100,5),
+   non_hispanic_black=c(0.2,0.6,0.9,1.5,2.5,4.1,6.7,10.9,15.3,21.3,27,32.3,38.5,40.3,43,41.2,35.8,32.1,22.2)/100,
+   hispanic=c(0.1,0.4,0.7,1.1,2,3.6,6.3,9.4,13.9,19.3,25.1,30.5,35.2,36.8,38.6,36.4,34.5,31.3,19.2)/100,
+   non_hispanic_white=c(0.1,0.3,0.4,0.5,0.9,1.4,2.8,5.2,9,12,15.5,19,21.7,25.7,24.9,24.7,21.7,17.6,13)/100
+   ),
+
+ us_pop_ethnicity_weights=c(non_hispanic_white=0.578, non_hispanic_black=0.121, hispanic=0.187)
 )
 
 
@@ -44,6 +52,16 @@ get_evidence <- function()
     age=40:80,
     male=approx(evidence$frc_prevalence_by_sex_age_raw$male[,1],evidence$frc_prevalence_by_sex_age_raw$male[,2], xout=40:80)$y,
     female=approx(evidence$frc_prevalence_by_sex_age_raw$female[,1],evidence$frc_prevalence_by_sex_age_raw$female[,2], xout=40:80)$y)
+
+
+  tmp1 <- (evidence$dm2_prevalence_by_race_raw[,names(evidence$us_pop_ethnicity_weights)]%*%evidence$us_pop_ethnicity_weights)/sum(evidence$us_pop_ethnicity_weights)
+  age <- 20:80
+  tmp2 <- approx(evidence$dm2_prevalence_by_race_raw[,1],tmp1, xout=age)$y
+
+  evidence$dm2_prevalence_by_age_sex <- cbind(
+    age=age,
+    male=tmp2,
+    female=tmp2)
 
   evidence
 }

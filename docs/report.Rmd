@@ -8,6 +8,7 @@ date: "2023-05-27"
 knitr::opts_chunk$set(echo = TRUE)
 
 library(OCSRiskCalculator)
+evidence <- OCSRiskCalculator:::evidence
 ```
 
 ## Context
@@ -57,4 +58,15 @@ legend(40,0.35,c('male','female'),col=c('green','blue'), lty = c(1,1))
 
 
 ```
+### Type 2 diabetes
 
+[LEe et al](http://dx.doi.org/10.5888/pcd16.180681) have reported the prevalence of type 2 diabetes by age. Note that it decines in older ages due to survivor effect but it should provide a good approximation of risk. Data are available for Figure 1 (in tabular format which obviates digitization).However, this figure is by race/ethnicity. As such, we need the proportion of different races in the US. The latter is taken from [the 2020 US census](https://www.npr.org/2021/08/13/1014710483/2020-census-data-us-race-ethnicity-diversity).
+
+
+
+
+```{r echo=FALSE}
+plot(evidence$dm2_prevalence_by_age_sex[,1], evidence$dm2_prevalence_by_age_sex[,'female'], col='blue', type='l', xlab='Age', ylab='Prevalence')
+lines(evidence$dm2_prevalence_by_age_sex[,1],evidence$dm2_prevalence_by_age_sex[,'male'], type='l', col='green')
+legend(20,0.20,c('male','female'),col=c('green','blue'), lty = c(1,1))
+```
