@@ -20,6 +20,14 @@ info_div_innerHTML <- "<TABLE style='background-color:gray;width:100%;height:100
                         </TBODY>
                       </TABLE>"
 
+start_here_innerHTML <- '<h1>← Start Here</h1>
+                        <p>Enter patient data in the left panel and press “Run the prediction model.”</p>
+                        <p>Inputs marked with <span style="color:red">*</span> are required.</p>
+                        <p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. None of the predictors on the left panel have a causal interpretation in the model. Changing them for a single patient to estimate the effect of an intervention would be misleading and should be avoided.  </span>
+                        <br></p>
+                        <p>For a detailed description of the model, please refer to the <a href="https://doi.org/10.1016/S2213-2600%2819%2930397-2">publication</a>.</p>
+                        <p>ACCEPT is also available as an Excel spreadsheet, R package, and API. Please refer to project <a href="http://resp.core.ubc.ca/research/Specific_Projects/accept">homepage</a> for more information.</p>'
+
 
 shinyApp(
   ui = fluidPage(
@@ -47,8 +55,8 @@ shinyApp(
         )
       )
       ,mainPanel(
-        textOutput("profile")
-        ,uiOutput("main", inline=T)
+        textOutput("profile"),
+        uiOutput("main"),
       )),
     tags$script(src="app.js")
   ),
@@ -76,17 +84,22 @@ shinyApp(
       out
     }
 
+
     observeEvent(input$calculate, {
       if(isolate(input$consent))
       {
         for(i in 1:length(outcomes))
         {
-            output[[paste0("panel_",outcomes[i])]] <- renderUI(HTML(create_res_panel(profile=pfl(), outcome=outcomes[i])))
+          local({
+            my_i <- i
+            output[[paste0("summary_",outcomes[my_i])]] <- renderUI(HTML(create_summary_panel(profile=pfl(), outcome=outcomes[my_i])))
+          })
         }
         for(nm in names(input))
           shinyjs::disable(nm)
         shinyjs::enable("reset")
         output$need_to_consent <- renderText("")
+        output$start_here <- renderUI(HTML(""))
       }
       else
       {
@@ -97,15 +110,17 @@ shinyApp(
     observeEvent(input$reset, {
       for(i in 1:length(outcomes))
       {
-        output[[paste0("panel_",outcomes[i])]] <- renderUI(HTML(""))
+        output[[paste0("summary_",outcomes[i])]] <- renderUI(HTML(""))
       }
+      output$start_here <- renderUI(HTML(start_here_innerHTML))
+
       updateCheckboxInput(inputId="consent",value = F)
       for(nm in names(input))
         shinyjs::enable(nm)
       output$need_to_consent <- renderText("")
     })
 
-    create_res_panel <- function(profile, outcome)
+    create_summary_panel <- function(profile, outcome)
     {
       #input$calculate
       tmp <- round(calculate_risk(profile,outcome)*1000)/10
@@ -135,13 +150,24 @@ shinyApp(
 
     outcomes <- get_outcomes()
 
-    output$main <- renderUI({
-          panel_output_list <- lapply(outcomes, function(i) {
-            panel_name <- paste0("panel_", i)
-            htmlOutput(panel_name, inline=T, fill=F)})
+    panels <- list(tabPanel("Summary", uiOutput("summary")))
+    for(i in 1:length(outcomes))
+    {
+      panels[[i+1]] <- tabPanel(names(outcomes)[i])
+    }
+    output$main <- renderUI(do.call(tabsetPanel,args=panels))
 
-          panel_output_list
+    output$summary <- renderUI({
+      panel_output_list <- list(htmlOutput("start_here", inline = T))
+      for(i in 1:length(outcomes))
+      {
+        panel_output_list[[i+1]] <- htmlOutput(paste0("summary_", outcomes[i]), inline=T, fill=F)
+      }
+
+      panel_output_list
     })
+
+    output$start_here <- renderUI(HTML(start_here_innerHTML))
 
     pfl <- reactive({
                  c(female=as.integer(input$female),
