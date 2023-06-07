@@ -1,7 +1,11 @@
 ---
-title: "Report"
-output: html_document
-date: "2023-05-27"
+title: "The OCS risk calculator"
+author: "Mohsen Sadatsafavi (NAPTIA Consultation)"
+date: "2023-06-06"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,62 +15,80 @@ library(OCSRiskCalculator)
 evidence <- OCSRiskCalculator:::evidence
 ```
 
-## Context
-Shall we look into the future or simply compare the excess risk of someone with a given OCS use profile versus someone who does not? Consider the case of a patient who has been taking OCS for 15 years. Shall we calculate the risk of diabetes in this patient compared with one who has not taking any OCS? Or predict the risk in the next 10 years? The latter assumes the patient does not currently have diabetes. And generally we do not know the risk of diabetes in a patient who has been taking OCS but has not yet developed diabetes. 
+## Background
+The purpose of this project is to create a Web App for quantifying the risk of long-term oral coticosteroid (OCS) use in patients with asthma. This will require two steps of
+
+1. Identifying relevant adverse events
+
+2. Estimating the baseline risk (in the absence of OCS use)
+
+3. Estimating the relative effect (risk ratio, hazard ratio, or odds ratio) of using OCS.
+
+Because evidence on background risk comes from different jurisdications, a clear focus on the target population is important. This report ficuses mainly on studies from the US.
+
+Based on a careful review of the literature, the two most important paper appear to be [Efraij et al](https://doi.org/10.1080/02770903.2018.1539100) and [Sullivan et al](http://dx.doi.org/10.1016/j.jaci.2017.04.009). Efraid et al's has the advantage that it is a systematic review. However, most results are based on only two studies. The paper by Sullivan, on the other hand, is a rigorous retrospective cohort study with a large sample size from the US.
+
+Per initial agreements, results are to be kept for a general case, stratified by sex and age. Exposure will be defined based on current and historical OCS use.
+
+## Rrisk quantification and communication
+There are two fundamental ways that the OCS risk can be quantified and communicated
+
+1. Given a history of OCS use, what is the excess risk of a given outcome for a person of given sex and age?
+
+2. Given a history of OCS use, and a plan for future use, what is the 10-year risk of a given outcome for a person of given sex and age?
+
+I strongly suggest the first question for two reasons. First, it does not make any presumption about whether the use already has the condition or not. For example, it will say that a person who has been using OCS at high dose for the past 7 years has now 12% higher chance of having Typ2 Diabetes compared to a similar person from the general population. On the other hand, #2 actually requires for the patient not to have diabetes right now. The evidence base reported in the literature does not really support this type of conditional risk estimation, and stronger assumptions can be made about #2.
 
 
-### Cataract:
-The background incidence of cataract was taken from [Waudby et a](https://doi.org/10.1186/1471-2415-11-32). In particular, their Figure 3 provides KM estimates by age which is helpful!
+## Exposure to OCS
+The way this variable is defined is dictated by the empirical studies investigating its association with outcomes. The main paper underlying this project by Sullivan et al, uses the current classification:
+  
+Current OCS dose:
+  - Low dose: 1-3 prescriptions per year 
+  - High dose: >3 prescriptions per year
+OCS use history:
+  - Number of years with low-dose exposure (1-3 prescriptions / y)
+  - Number of years with high-dose exposure (> prescriptions / y)
+  
+To make this simple, I suggest that we classify the exposure as following three questions:
 
-The values were digitized at 5-year intervals and then were interpolated, resulting in the following curves
+1) Currently taking OCS:
+ No / Yes
+ 
+2) Number of years taking corticosteroids
+ [numerical input]
+ 
+3) Historical OCS use intensity
+  Low dose / high dose
 
-```{r echo=FALSE}
-plot(evidence$ctc_prevalence_by_sex_age[,1], evidence$ctc_prevalence_by_sex_age[,'male'], col='green', type='l', xlab='Age', ylab='Prevalence')
-lines(evidence$ctc_prevalence_by_sex_age[,1],evidence$ctc_prevalence_by_sex_age[,'female'], type='l', col='blue')
-legend(40,0.7,c('male','female'),col=c('green','blue'), lty = c(1,1))
+## Adverse events
+Upon reviewing the literature, the following adverse events are being modeled: 
 
-```
+* Osteoporosis fractures
+* Diabetes
+* Cataract
+* Hypertension
+* Dyslipidemia
 
+These are chosen because the excess risk due to OCS is nontrivial, and there is relatively robust evidence for estimating background risk by age and sex.
 
-### Hypertension
-[Robitaile et al](https://doi.org/10.1503/cmaj.101863) provides incidence by age and sex in Canada (see their Figure 3). 
+## Evidence synthesis and statistical analysis
 
-For now I am approximating the annual incidence by a function {((x-20)/80)^2/10}, which is a good approximation by now (and the incidence is similar between male and female)
+The scale of interest for risk equations is the absolute risk, whereas the scale of inference (in both Efraij and Sullivan et al) is the relative scale (hazard ratio or rate ratios). Transforming the relative risk to absolute risk will require estimating the baseline incidence of each outcome. For background risk, I will synthesize evidence from general cohort studies and population-based estimates, with an emphasis on US studies. This assumes that the risk is the same between general population and asthma patients not exposed to OCS.This assumption seems to be safe as there is no strong association between asthma and identified outcome conditions.
 
-```{r echo=FALSE}
+The structure of the final risk equations will have the form
 
-plot(evidence$htn_incidence_by_sex_age[,1], evidence$htn_incidence_by_sex_age[,'male'], col='green', type='l', xlab='Age', ylab='Incidence')
-lines(evidence$htn_incidence_by_sex_age[,1],evidence$htn_incidence_by_sex_age[,'female'], type='l', col='blue')
-legend(40,0.05,c('male','female'),col=c('green','blue'), lty = c(1,1))
+Log-odds(risk)=β0 + β1.X1 + β2.X2 + β3*X3 + ...
 
+where X1, X2, X3, ... are gender, age, and OCS-exposure variables. The structure of the above-mentioned equation will be modified depending on the nuances of the available evidence.
 
-```
+## Web app
+An interactive web app will be developed and made publicly available. A proposed snapshot of the app is provided below.
 
+![](AppExample.png)
 
-
-
-### Fractures
-[Shen et al](https://doi.org/10.3389%2Ffendo.2022.882241) uses GBD data to estimate the GLOBAL prevalence of fractures (see Figure 2 D). 
-
-I have digitized the prevalence (which is really cumulative incidence for fractures) by sex and age from Figure 2-D. 
-
-```{r echo=FALSE}
-
-plot(evidence$frc_prevalence_by_sex_age[,1], evidence$frc_prevalence_by_sex_age[,'female'], col='blue', type='l', xlab='Age', ylab='Prevalence')
-lines(evidence$frc_prevalence_by_sex_age[,1],evidence$frc_prevalence_by_sex_age[,'male'], type='l', col='green')
-legend(40,0.35,c('male','female'),col=c('green','blue'), lty = c(1,1))
-
-
-```
-### Type 2 diabetes
-
-[LEe et al](http://dx.doi.org/10.5888/pcd16.180681) have reported the prevalence of type 2 diabetes by age. Note that it decines in older ages due to survivor effect but it should provide a good approximation of risk. Data are available for Figure 1 (in tabular format which obviates digitization).However, this figure is by race/ethnicity. As such, we need the proportion of different races in the US. The latter is taken from [the 2020 US census](https://www.npr.org/2021/08/13/1014710483/2020-census-data-us-race-ethnicity-diversity).
+# End of document
 
 
 
 
-```{r echo=FALSE}
-plot(evidence$dm2_prevalence_by_age_sex[,1], evidence$dm2_prevalence_by_age_sex[,'female'], col='blue', type='l', xlab='Age', ylab='Prevalence')
-lines(evidence$dm2_prevalence_by_age_sex[,1],evidence$dm2_prevalence_by_age_sex[,'male'], type='l', col='green')
-legend(20,0.20,c('male','female'),col=c('green','blue'), lty = c(1,1))
-```

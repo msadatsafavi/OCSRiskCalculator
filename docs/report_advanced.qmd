@@ -1,0 +1,61 @@
+---
+title: "Report.Advanced"
+format: html
+editor: visual
+---
+
+### Cataract:
+The background incidence of cataract was taken from [Waudby et a](https://doi.org/10.1186/1471-2415-11-32). In particular, their Figure 3 provides KM estimates by age which is helpful!
+
+The values were digitized at 5-year intervals and then were interpolated, resulting in the following curves
+
+```{r echo=FALSE}
+plot(evidence$ctc_prevalence_by_sex_age[,1], evidence$ctc_prevalence_by_sex_age[,'male'], col='green', type='l', xlab='Age', ylab='Prevalence')
+lines(evidence$ctc_prevalence_by_sex_age[,1],evidence$ctc_prevalence_by_sex_age[,'female'], type='l', col='blue')
+legend(40,0.7,c('male','female'),col=c('green','blue'), lty = c(1,1))
+
+```
+
+
+### Hypertension
+[Robitaile et al](https://doi.org/10.1503/cmaj.101863) provides incidence by age and sex in Canada (see their Figure 3). 
+
+For now I am approximating the annual incidence by a function {((x-20)/80)^2/10}, which is a good approximation by now (and the incidence is similar between male and female)
+
+```{r echo=FALSE}
+
+plot(evidence$htn_incidence_by_sex_age[,1], evidence$htn_incidence_by_sex_age[,'male'], col='green', type='l', xlab='Age', ylab='Incidence')
+lines(evidence$htn_incidence_by_sex_age[,1],evidence$htn_incidence_by_sex_age[,'female'], type='l', col='blue')
+legend(40,0.05,c('male','female'),col=c('green','blue'), lty = c(1,1))
+
+
+```
+
+
+
+
+### Fractures
+[Shen et al](https://doi.org/10.3389%2Ffendo.2022.882241) uses GBD data to estimate the GLOBAL prevalence of fractures (see Figure 2 D). 
+
+I have digitized the prevalence (which is really cumulative incidence for fractures) by sex and age from Figure 2-D. 
+
+```{r echo=FALSE}
+
+plot(evidence$frc_prevalence_by_sex_age[,1], evidence$frc_prevalence_by_sex_age[,'female'], col='blue', type='l', xlab='Age', ylab='Prevalence')
+lines(evidence$frc_prevalence_by_sex_age[,1],evidence$frc_prevalence_by_sex_age[,'male'], type='l', col='green')
+legend(40,0.35,c('male','female'),col=c('green','blue'), lty = c(1,1))
+
+
+```
+### Type 2 diabetes
+
+[LEe et al](http://dx.doi.org/10.5888/pcd16.180681) have reported the prevalence of type 2 diabetes by age. Note that it decines in older ages due to survivor effect but it should provide a good approximation of risk. Data are available for Figure 1 (in tabular format which obviates digitization).However, this figure is by race/ethnicity. As such, we need the proportion of different races in the US. The latter is taken from [the 2020 US census](https://www.npr.org/2021/08/13/1014710483/2020-census-data-us-race-ethnicity-diversity).
+
+
+
+
+```{r echo=FALSE}
+plot(evidence$dm2_prevalence_by_age_sex[,1], evidence$dm2_prevalence_by_age_sex[,'female'], col='blue', type='l', xlab='Age', ylab='Prevalence')
+lines(evidence$dm2_prevalence_by_age_sex[,1],evidence$dm2_prevalence_by_age_sex[,'male'], type='l', col='green')
+legend(20,0.20,c('male','female'),col=c('green','blue'), lty = c(1,1))
+```
