@@ -39,11 +39,9 @@ shinyApp(
     titlePanel("OCS risk calculator"),
     sidebarLayout(
       sidebarPanel(
-         numericInput("age", label="age", min=18, max=80, value=40, width="50%")
-        ,radioButtons("female","Gender:", choices=c("Female"=1, "Male"=0))
-        ,radioButtons("cur_ocs","Currently taking OCS:", choices=c("No"=0, "Yes"=1))
-        ,numericInput("ocs_years", label="Number of years taking corticosteroids", min=1, max=30, value=10, width="50%")
-        ,radioButtons("hist_ocs","Generally, your OCS dose has been", choices=c("Low"=0, "High"=1))
+         radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
+        ,numericInput("ocs_years", label="Number of years taking oral corticosteroids", min=1, max=30, value=10, width="50%")
+        ,radioButtons("ocs_intensity","Generally, your oral corticosteroids dose has been", choices=c("Low"=0, "High"=1))
         ,checkboxInput("consent","I understand the risks of using this tool")
         ,actionButton("calculate","Calculate!")
         ,actionButton("reset","Restart")
@@ -85,6 +83,7 @@ shinyApp(
     }
 
 
+
     observeEvent(input$calculate, {
       if(isolate(input$consent))
       {
@@ -123,20 +122,20 @@ shinyApp(
     create_summary_panel <- function(profile, outcome)
     {
       #input$calculate
-      tmp <- round(calculate_risk(profile,outcome)*1000)/10
-      tmp_i <- round(tmp)
+      tmp <- round(calculate_risk(profile,outcome),2)
+      tmp_i <- max(round(tmp*100-100),0)
       paste0("<DIV id='",outcome,"' onmouseover='mouseOverOutcome(this.id)' onmouseout='mouseExitOutcome(this.id)'>
                 <A href='http://www.sony.com'>
                   <TABLE style='float:left;border:1px black solid;width:250pt;margin-top: 20px;  margin-bottom: 20px;  margin-right: 20px;  margin-left: 20px;'>
                     <TBODY>
                       <TR>
-                        <TD>",names(outcomes)[which(outcomes==outcome)],":",tmp[1],"% (from:", tmp[2],"% to:", tmp[3],"%)
+                        <TD>",names(outcomes)[which(outcomes==outcome)],":",tmp,"
                         </TD>
                       </TR>
                       <TR>
                         <TD>
                           <DIV style='position:relative;z-index:1'>",
-                            generate_icon_array(counts=c(tmp_i[2],tmp_i[1],100-tmp_i[2]-tmp_i[1])),"
+                            generate_icon_array(order=c('red','green','yellow'), counts=c(tmp_i, 100-tmp_i, 0)),"
                             <DIV id='more_info_",outcome,"' style='position:absolute;width:100%;height:100%;top:0;left:0;z-index:10;opacity:0.5;visibility:hidden'>",info_div_innerHTML,"
                             </DIV>
                           </DIV>
@@ -173,8 +172,8 @@ shinyApp(
                  c(female=as.integer(input$female),
                  age= as.integer(input$age),
                  cur_ocs=as.integer(input$cur_ocs),
-                 hist_ocs_low_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==0)),
-                 hist_ocs_high_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==1)))
+                 ocs_year=(as.integer(input$ocs_years)),
+                 ocs_intensity=(as.integer(input$ocs_intensity)))
               })
 
     output$profile <- renderText(pfl())
