@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyWidgets)
 library(OCSRiskCalculator)
 
 faces <- c(red='<svg class="red-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.red-face .cls-1{fill:#a53a47;}.red-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><path class="cls-2" d="M8.3,6a2,2,0,1,1-2-2A2,2,0,0,1,8.3,6Z"></path><circle class="cls-2" cx="14.7" cy="5.98" r="1.97"></circle><path class="cls-2" d="M16.61,15.38a6.29,6.29,0,0,0-12.18,0,.33.33,0,0,0,.24.41.34.34,0,0,0,.42-.24,5.6,5.6,0,0,1,10.86,0,.36.36,0,0,0,.15.21.39.39,0,0,0,.18,0h.08A.34.34,0,0,0,16.61,15.38Z"></path></g></g></svg>',
@@ -6,27 +7,27 @@ faces <- c(red='<svg class="red-face" xmlns="http://www.w3.org/2000/svg" viewBox
           yellow='<svg class="yellow-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.yellow-face .cls-1{fill:#eea342;}.yellow-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><circle class="cls-2" cx="6.67" cy="7.92" r="1.81"></circle><circle class="cls-2" cx="14.36" cy="7.92" r="1.81"></circle><path class="cls-2" d="M17.12,14.29A11.46,11.46,0,0,1,4,14.3a.45.45,0,1,0-.53.73,12.42,12.42,0,0,0,7.17,2.23,11.66,11.66,0,0,0,7-2.25.45.45,0,0,0,.09-.63A.46.46,0,0,0,17.12,14.29Z"></path></g></g></svg>')
 
 
-info_div_innerHTML <- "<TABLE style='background-color:gray;width:100%;height:100%'>
-                        <TBODY>
-                          <TR>
-                            <TD></TD>
-                            <TD align='center'>
-                              <SPAN style='border:5px red solid; background-color:orange;'>
-                                More Info
-                              </SPAN>
-                            </TD>
-                            <TD></TD>
-                          </TR>
-                        </TBODY>
-                      </TABLE>"
+time_range_map <- c(
+  "<1 year"=0.5,
+  "1-2 years"=1.5,
+  "2-3 years"=2.5,
+  "3-4 years"=3.5,
+  "4-5 years"=4.5,
+  "5-6 years"=5.5,
+  "6-7 years"=6.5,
+  "7-8 years"=7.5,
+  "8-9 years"=8.5,
+  "9-10 years"=9.5,
+  "10 years or more"=10.5
+)
+
+
 
 start_here_innerHTML <- '<h1>← Start Here</h1>
-                        <p>Enter patient data in the left panel and press “Run the prediction model.”</p>
-                        <p>Inputs marked with <span style="color:red">*</span> are required.</p>
-                        <p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. None of the predictors on the left panel have a causal interpretation in the model. Changing them for a single patient to estimate the effect of an intervention would be misleading and should be avoided.  </span>
+                        <p>Enter patient data in the left panel and press “Calculate” after agreeing with the terms</p>
+                        <p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. None of the variables on the left panel have a causal interpretation in the model. Changing them for a single patient to estimate the effect of an intervention would be misleading and should be avoided.  </span>
                         <br></p>
-                        <p>For a detailed description of the model, please refer to the <a href="https://doi.org/10.1016/S2213-2600%2819%2930397-2">publication</a>.</p>
-                        <p>ACCEPT is also available as an Excel spreadsheet, R package, and API. Please refer to project <a href="http://resp.core.ubc.ca/research/Specific_Projects/accept">homepage</a> for more information.</p>'
+                        <p>For a detailed description of the tool, please refer to the <a href="https://doi.org/10.1016/S2213-2600%2819%2930397-2">publication</a>.</p>'
 
 
 shinyApp(
@@ -40,7 +41,13 @@ shinyApp(
     sidebarLayout(
       sidebarPanel(
          radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
-        ,numericInput("ocs_years", label="Number of years taking oral corticosteroids", min=1, max=30, value=10, width="50%")
+        #,sliderInput("ocs_years", label="Number of years taking oral corticosteroids", min=1, max=10, value=1, width="50%")
+        ,sliderTextInput(
+          inputId = "ocs_years",
+          label = "Number of years taking oral corticosteroids:",
+          choices = names(time_range_map),
+          selected = names(time_range_map)[5]
+        )
         ,radioButtons("ocs_intensity","Generally, your oral corticosteroids dose has been", choices=c("Low"=0, "High"=1))
         ,checkboxInput("consent","I understand the risks of using this tool")
         ,actionButton("calculate","Calculate!")
@@ -59,41 +66,44 @@ shinyApp(
     tags$script(src="app.js")
   ),
 
-
   server = function(input, output, session)
   {
-    generate_icon_array <- function(order=c('yellow','red','green'),counts=c(50,30,20))
-    {
-      x <- c(rep(faces[order[1]],counts[1]),
-             rep(faces[order[2]],counts[2]),
-             rep(faces[order[3]],counts[3]))
-      out <- "<TABLE style='width:100%;margin:0;padding:0'><TBODY>"
-      for(i in 1:10)
-      {
-        out <- paste(out,"<TR>")
-        for(j in 1:10)
-        {
-          out <- paste(out,"<TD style='width:10%;height=10%'>",x[10*(i-1)+j],"</TD>")
-        }
-        out <- paste(out,"</TR>")
-      }
-      out <- paste(out,"</TBODY></TABLE>")
+    outcomes <- get_outcomes()
 
-      out
+    panels <- list(tabPanel("Summary", htmlOutput("start_here"),  plotOutput("summary", inline = T)))
+    for(i in 1:length(outcomes))
+    {
+      panels[[i+1]] <- tabPanel(names(outcomes)[i], htmlOutput(paste0("details_", outcomes[i]), inline=T, fill=F))
+
+    }
+    output$main <- renderUI(do.call(tabsetPanel,args=panels))
+
+    for(i in 1:length(outcomes))
+    {
+      local(
+      {
+        my_i <- i
+        output[[paste0("details_",outcomes[my_i])]] <- renderUI(create_single_page(outcomes[my_i]))
+      })
     }
 
+    output$start_here <- renderUI(HTML(start_here_innerHTML))
 
+    pfl <- reactive({
+      c(female=as.integer(input$female),
+        age= as.integer(input$age),
+        cur_ocs=as.integer(input$cur_ocs),
+        ocs_year=(time_range_map[input$ocs_years]),
+        ocs_intensity=(as.integer(input$ocs_intensity)))
+    })
 
-    observeEvent(input$calculate, {
+    output$profile <- renderText(pfl())
+
+        observeEvent(input$calculate, {
       if(isolate(input$consent))
       {
-        for(i in 1:length(outcomes))
-        {
-          local({
-            my_i <- i
-            output[[paste0("summary_",outcomes[my_i])]] <- renderUI(HTML(create_summary_panel(profile=pfl(), outcome=outcomes[my_i])))
-          })
-        }
+        create_bar_plot(profile=pfl(), outcomes=outcomes)
+
         for(nm in names(input))
           shinyjs::disable(nm)
         shinyjs::enable("reset")
@@ -112,6 +122,7 @@ shinyApp(
         output[[paste0("summary_",outcomes[i])]] <- renderUI(HTML(""))
       }
       output$start_here <- renderUI(HTML(start_here_innerHTML))
+      output$summary <- NULL
 
       updateCheckboxInput(inputId="consent",value = F)
       for(nm in names(input))
@@ -119,65 +130,62 @@ shinyApp(
       output$need_to_consent <- renderText("")
     })
 
-    create_summary_panel <- function(profile, outcome)
+    create_bar_plot <- function(profile, outcomes)
     {
       #input$calculate
-      tmp <- round(calculate_risk(profile,outcome),2)
-      tmp_i <- max(round(tmp*100-100),0)
-      paste0("<DIV id='",outcome,"' onmouseover='mouseOverOutcome(this.id)' onmouseout='mouseExitOutcome(this.id)'>
-                <A href='http://www.sony.com'>
-                  <TABLE style='float:left;border:1px black solid;width:250pt;margin-top: 20px;  margin-bottom: 20px;  margin-right: 20px;  margin-left: 20px;'>
-                    <TBODY>
-                      <TR>
-                        <TD>",names(outcomes)[which(outcomes==outcome)],":",tmp,"
-                        </TD>
-                      </TR>
-                      <TR>
-                        <TD>
-                          <DIV style='position:relative;z-index:1'>",
-                            generate_icon_array(order=c('red','green','yellow'), counts=c(tmp_i, 100-tmp_i, 0)),"
-                            <DIV id='more_info_",outcome,"' style='position:absolute;width:100%;height:100%;top:0;left:0;z-index:10;opacity:0.5;visibility:hidden'>",info_div_innerHTML,"
-                            </DIV>
-                          </DIV>
-                        </TD>
-                      </TR>
-                    </TBODY>
-                  </TABLE>
-                </A>
-             </DIV>")
-    }
-
-    outcomes <- get_outcomes()
-
-    panels <- list(tabPanel("Summary", uiOutput("summary")))
-    for(i in 1:length(outcomes))
-    {
-      panels[[i+1]] <- tabPanel(names(outcomes)[i])
-    }
-    output$main <- renderUI(do.call(tabsetPanel,args=panels))
-
-    output$summary <- renderUI({
-      panel_output_list <- list(htmlOutput("start_here", inline = T))
+      rrs <- rep(NA,length(outcomes))
       for(i in 1:length(outcomes))
       {
-        panel_output_list[[i+1]] <- htmlOutput(paste0("summary_", outcomes[i]), inline=T, fill=F)
+        rrs[i] <- calculate_risk(profile,outcomes[i])
       }
 
-      panel_output_list
+      labels <- sapply(rrs, function(x)
+        {
+          if(x<1) "No increase"
+          else
+            if(x>2) ">100%"
+            else
+              paste0("+",round(x*100-100),"%")
+        })
+
+        rrs <- sapply(rrs, function(x)
+        {
+          if(x<1) 1
+          else
+            if(x>2) 2
+          else
+            x
+        })
+
+
+      df <- data.frame(outcome=names(outcomes),rr=rrs,label=labels)
+
+      require(ggplot2)
+      plt <- ggplot(data=df,aes(x=outcome, y=rr))+
+        xlab("")+ylab("")+
+        #ylim(0,2.5)+
+        geom_bar(stat="identity")+
+        geom_text(aes(label=label), hjust=1, vjust=0.5, color="yellow", size=7)+
+        theme(axis.text=element_text(size=20))+
+        geom_hline(yintercept=1, linetype="dashed", color = "orange", size=0.5)+
+        coord_flip()
+
+      output$summary <- renderPlot(plt, width=1000, height=500)
+    }
+
+
+    create_single_page <- function(outcome)
+    {
+      list(
+        sliderInput(paste0(outcome,"_before"),label="Your risk without using OCS",min=0,max=100, value=50),
+        progressBar(paste0(outcome,"_after"), value = 0, title = "Your risk with using OCS", display_pct = TRUE, status = "danger", striped = TRUE)
+      )
+    }
+
+    observeEvent(input$ost_before, {
+      updateProgressBar(id="ost_after",value=input$ost_before/2)
+      #shinyjs::disable('ost_after')
     })
-
-    output$start_here <- renderUI(HTML(start_here_innerHTML))
-
-    pfl <- reactive({
-                 c(female=as.integer(input$female),
-                 age= as.integer(input$age),
-                 cur_ocs=as.integer(input$cur_ocs),
-                 ocs_year=(as.integer(input$ocs_years)),
-                 ocs_intensity=(as.integer(input$ocs_intensity)))
-              })
-
-    output$profile <- renderText(pfl())
-
 
     #output$icon_array <- renderText(HTML(generate_icon_array()))
   }
