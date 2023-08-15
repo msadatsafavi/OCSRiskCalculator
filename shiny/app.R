@@ -2,9 +2,8 @@ library(shiny)
 library(shinyWidgets)
 library(OCSRiskCalculator)
 
-faces <- c(red='<svg class="red-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.red-face .cls-1{fill:#a53a47;}.red-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><path class="cls-2" d="M8.3,6a2,2,0,1,1-2-2A2,2,0,0,1,8.3,6Z"></path><circle class="cls-2" cx="14.7" cy="5.98" r="1.97"></circle><path class="cls-2" d="M16.61,15.38a6.29,6.29,0,0,0-12.18,0,.33.33,0,0,0,.24.41.34.34,0,0,0,.42-.24,5.6,5.6,0,0,1,10.86,0,.36.36,0,0,0,.15.21.39.39,0,0,0,.18,0h.08A.34.34,0,0,0,16.61,15.38Z"></path></g></g></svg>',
-          green='<svg class="green-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.green-face .cls-1{fill:#2eb49a;}.green-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><circle class="cls-2" cx="6.64" cy="6.95" r="1.83"></circle><circle class="cls-2" cx="14.42" cy="6.95" r="1.83"></circle><path class="cls-2" d="M16.67,11.29a.36.36,0,0,0-.27,0,.41.41,0,0,0-.17.22,5.89,5.89,0,0,1-11.41,0,.36.36,0,0,0-.16-.22.36.36,0,0,0-.27,0,.37.37,0,0,0-.22.17.36.36,0,0,0,0,.27,6.61,6.61,0,0,0,12.8,0A.37.37,0,0,0,16.67,11.29Z"></path></g></g></svg>',
-          yellow='<svg class="yellow-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.yellow-face .cls-1{fill:#eea342;}.yellow-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><circle class="cls-2" cx="6.67" cy="7.92" r="1.81"></circle><circle class="cls-2" cx="14.36" cy="7.92" r="1.81"></circle><path class="cls-2" d="M17.12,14.29A11.46,11.46,0,0,1,4,14.3a.45.45,0,1,0-.53.73,12.42,12.42,0,0,0,7.17,2.23,11.66,11.66,0,0,0,7-2.25.45.45,0,0,0,.09-.63A.46.46,0,0,0,17.12,14.29Z"></path></g></g></svg>')
+source("single_page.R")
+source("summary_page.R")
 
 
 time_range_map <- c(
@@ -24,31 +23,96 @@ time_range_map <- c(
 
 
 start_here_innerHTML <- '<h1>← Start Here</h1>
-                        <p>Enter patient data in the left panel and press “Calculate” after agreeing with the terms</p>
+                        <p>Enter your data in the left panel and press “Calculate” after agreeing with the terms</p>
                         <p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. None of the variables on the left panel have a causal interpretation in the model. Changing them for a single patient to estimate the effect of an intervention would be misleading and should be avoided.  </span>
                         <br></p>
-                        <p>For a detailed description of the tool, please refer to the <a href="https://doi.org/10.1016/S2213-2600%2819%2930397-2">publication</a>.</p>'
+                        <p>For a detailed description of the tool, please refer to the <a href="https://doi.org/10.1016/S2213-2600%2819%2930397-2">About page</a>.</p>'
 
 
 shinyApp(
   ui = fluidPage(
+    tags$style(
+    "
+    #summary_desc {
+      border-width:1px;
+      border-style:solid;
+      border-color:#959595;
+      background-color: #0e406a;
+      font-size: 20px;
+      color: white;
+    }
+
+    #summary_plot {
+      border-width:1px;
+      background-color: #d8eaf5;
+    }
+
+    #high_dose_desc {
+      border-width:1px;
+      border-style:solid;
+      border-color:#959595;
+      font-style: italic;
+    }
+
+    .container-fluid {
+      background-color: #d8eaf5;
+    }
+
+    .nav-tabs {
+      font-size: 20px;
+    }
+
+    body {
+      background-color: #d8eaf5;
+    }
+
+    #input_panel {
+      background-color: white;
+      font-size: 20px;
+    }
+
+    #title_panel {
+      background-color: #8b3972;
+      color: white;
+      height: 80px;
+      padding: 20px;
+      border: 3px solid #eea342;
+    }
+
+    #about_button {
+      background-color: white;
+      color: #0e406a;
+      border: 3px solid #0e406a;
+      padding: 15px;
+      font-size: 20px;
+    }
+
+    #footer {
+      text-align: center;
+    }
+
+    "),
     shinyjs::useShinyjs(),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
     ),
-    print(paste("Server version: 0.1")),
-    titlePanel("OCS risk calculator"),
+    print(paste("Server version: 0.3 (2023.08.15)")),
+    titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator",align="center")),
     sidebarLayout(
-      sidebarPanel(
+      sidebarPanel(id="input_panel",
          radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
-        #,sliderInput("ocs_years", label="Number of years taking oral corticosteroids", min=1, max=10, value=1, width="50%")
+        #,sliderInput("ocs_years", label="Number of years taking oral corticosteroids:", min=1, max=10, value=1, width="50%")
+        ,hr()
         ,sliderTextInput(
           inputId = "ocs_years",
           label = "Number of years taking oral corticosteroids:",
           choices = names(time_range_map),
           selected = names(time_range_map)[5]
         )
-        ,radioButtons("ocs_intensity","Generally, your oral corticosteroids dose has been", choices=c("Low"=0, "High"=1))
+        ,hr()
+        ,radioButtons("ocs_intensity","Generally, your oral corticosteroids dose has been:", choices=c("Low"=0, "High"=1))
+        ,p(id="high_dose_desc", "Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
+        ,hr()
         ,checkboxInput("consent","I understand the risks of using this tool")
         ,actionButton("calculate","Calculate!")
         ,actionButton("reset","Restart")
@@ -63,22 +127,26 @@ shinyApp(
         textOutput("profile"),
         uiOutput("main"),
       )),
-    tags$script(src="app.js")
+    tags$script(src="app.js"),
+    hr(),
+    div(id="footer",
+        a(id="about_button","About this calculator"),
+        textOutput("outcome_clicked")
+        )
   ),
+
 
   server = function(input, output, session)
   {
     outcomes <- get_outcomes()
 
-    panels <- list(tabPanel("Summary", htmlOutput("start_here"),  plotOutput("summary", inline = T)))
+    panels <- list(tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")))
     for(i in 1:length(outcomes))
     {
       panels[[i+1]] <- tabPanel(names(outcomes)[i], htmlOutput(paste0("details_", outcomes[i]), inline=T, fill=F))
 
     }
     output$main <- renderUI(do.call(tabsetPanel,args=panels))
-
-
 
     output$start_here <- renderUI(HTML(start_here_innerHTML))
 
@@ -95,7 +163,9 @@ shinyApp(
     observeEvent(input$calculate, {
       if(isolate(input$consent))
       {
-        create_bar_plot(profile=pfl(), outcomes=outcomes)
+        plt <- create_bar_plot(profile=pfl(), outcomes=outcomes)
+        output$summary_plot <- renderUI(HTML(plt))
+        output$summary_desc <- renderUI(generate_summary_text())
 
         for(nm in names(input))
           shinyjs::disable(nm)
@@ -123,7 +193,8 @@ shinyApp(
         output[[paste0("summary_",outcomes[i])]] <- renderUI(HTML(""))
       }
       output$start_here <- renderUI(HTML(start_here_innerHTML))
-      output$summary <- NULL
+      output$summary_plot <- NULL
+      output$summary_desc <- NULL
 
       updateCheckboxInput(inputId="consent",value = F)
       for(nm in names(input))
@@ -139,57 +210,13 @@ shinyApp(
       }
     })
 
-    create_bar_plot <- function(profile, outcomes)
+
+    observeEvent(input$outcome_clicked,
     {
-      #input$calculate
-      rrs <- rep(NA,length(outcomes))
-      for(i in 1:length(outcomes))
-      {
-        rrs[i] <- calculate_risk(profile,outcomes[i])
-      }
-
-      labels <- sapply(rrs, function(x)
-        {
-          if(x<1) "No increase"
-          else
-            if(x>2) ">100%"
-            else
-              paste0("+",round(x*100-100),"%")
-        })
-
-        rrs <- sapply(rrs, function(x)
-        {
-          if(x<1) 1
-          else
-            if(x>2) 2
-          else
-            x
-        })
+      output$outcome_clicked <- renderText(input$outcome_clicked)
+    })
 
 
-      df <- data.frame(outcome=names(outcomes),rr=rrs,label=labels)
-
-      require(ggplot2)
-      plt <- ggplot(data=df,aes(x=outcome, y=rr))+
-        xlab("")+ylab("")+
-        #ylim(0,2.5)+
-        geom_bar(stat="identity")+
-        geom_text(aes(label=label), hjust=1, vjust=0.5, color="yellow", size=7)+
-        theme(axis.text=element_text(size=20))+
-        geom_hline(yintercept=1, linetype="dashed", color = "orange", size=0.5)+
-        coord_flip()
-
-      output$summary <- renderPlot(plt, width=1000, height=500)
-    }
-
-
-    create_single_page <- function(outcome)
-    {
-      list(
-        sliderInput(paste0(outcome,"_before"),label="Your risk without using OCS",min=0,max=100, value=50),
-        progressBar(paste0(outcome,"_after"), value = 0, title = "Your risk with using OCS", display_pct = TRUE, status = "danger", striped = TRUE)
-      )
-    }
 
     for(i in 1:length(outcomes))
     {
@@ -198,7 +225,14 @@ shinyApp(
         my_i <- i
         oc <- outcomes[my_i]
         observeEvent(input[[paste0(oc,"_before")]], {
-          updateProgressBar(id=paste0(oc,"_after"),value=input[[paste0(oc,"_before")]]/2)
+          risk_before <- input[[paste0(oc,"_before")]]/100
+          risk_after <- (risk_before)^0.5
+          updateProgressBar(id=paste0(oc,"_after"),value=risk_after*100)
+          yellow <- round(risk_before*100)
+          red <- round(risk_after*100) - yellow
+          green <- 100 - red - yellow
+          output[[paste0(oc,"_icon_array")]] <- renderUI(HTML(generate_icon_array(counts=c(yellow, red, green))))
+          output[[paste0(oc,"_icon_array_legend")]] <- renderUI(HTML(xxx()))
         })
       })
     }
