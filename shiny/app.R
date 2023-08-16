@@ -7,7 +7,7 @@ source("summary_page.R")
 
 
 time_range_map <- c(
-  "<1 year"=0.5,
+  "<1 year"=0,
   "1-2 years"=1.5,
   "2-3 years"=2.5,
   "3-4 years"=3.5,
@@ -125,28 +125,47 @@ shinyApp(
       )
       ,mainPanel(
         textOutput("profile"),
-        uiOutput("main"),
+        tabsetPanel(id="main_panel",
+                    tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")),
+                    tabPanel("Specific outcome",
+                             h3(paste0("In this page, we evaluate the risk of specific outcomes")),
+                             selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
+                             uiOutput("specific_outcome_content")),
+                    tabPanel("About")),
       )),
     tags$script(src="app.js"),
     hr(),
     div(id="footer",
-        a(id="about_button","About this calculator"),
-        textOutput("outcome_clicked")
+        a(id="about_button","About this calculator")
         )
   ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   server = function(input, output, session)
   {
     outcomes <- get_outcomes()
 
-    panels <- list(tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")))
-    for(i in 1:length(outcomes))
-    {
-      panels[[i+1]] <- tabPanel(names(outcomes)[i], htmlOutput(paste0("details_", outcomes[i]), inline=T, fill=F))
-
-    }
-    output$main <- renderUI(do.call(tabsetPanel,args=panels))
+    # panels <- list(tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")))
+    # for(i in 1:2)
+    # {
+    #   panels[[i+1]] <- tabPanel(names(outcomes)[i], htmlOutput(paste0("details_", outcomes[i]), inline=T, fill=F))
+    #
+    # }
+    # output$main <- renderUI(do.call(tabsetPanel,args=panels))
 
     output$start_here <- renderUI(HTML(start_here_innerHTML))
 
@@ -172,14 +191,10 @@ shinyApp(
         shinyjs::enable("reset")
         output$need_to_consent <- renderText("")
         output$start_here <- renderUI(HTML(""))
-        for(i in 1:length(outcomes))
-        {
-          local(
-            {
-              my_i <- i
-              output[[paste0("details_",outcomes[my_i])]] <- renderUI(create_single_page(outcomes[my_i]))
-            })
-        }
+
+        shinyjs::enable("specific_outcome_selector")
+        if(input$specific_outcome_selector!="PLEASE SELECT")
+          output$specific_outcome_content <- renderUI(create_specific_coutcome_content(pfl(), input$specific_outcome_selector))
       }
       else
       {
@@ -200,42 +215,47 @@ shinyApp(
       for(nm in names(input))
         shinyjs::enable(nm)
       output$need_to_consent <- renderText("")
-      for(i in 1:length(outcomes))
-      {
-        local(
-          {
-            my_i <- i
-            output[[paste0("details_",outcomes[my_i])]] <- renderUI("")
-          })
-      }
+
+      output$specific_outcome_content <- renderUI("")
+      shinyjs::disable("specific_outcome_selector")
     })
 
 
     observeEvent(input$outcome_clicked,
     {
-      output$outcome_clicked <- renderText(input$outcome_clicked)
+      updateSelectInput(
+        inputId="specific_outcome_selector",
+        selected = input$outcome_clicked
+      )
+
+      updateTabsetPanel(session, inputId="main_panel", selected="Specific outcome")
+
     })
 
 
-
-    for(i in 1:length(outcomes))
+    observeEvent(input$specific_outcome_selector,
     {
-      local(
+      if(input$specific_outcome_selector!="PLEASE SELECT")
       {
-        my_i <- i
-        oc <- outcomes[my_i]
-        observeEvent(input[[paste0(oc,"_before")]], {
-          risk_before <- input[[paste0(oc,"_before")]]/100
-          risk_after <- (risk_before)^0.5
-          updateProgressBar(id=paste0(oc,"_after"),value=risk_after*100)
-          yellow <- round(risk_before*100)
-          red <- round(risk_after*100) - yellow
-          green <- 100 - red - yellow
-          output[[paste0(oc,"_icon_array")]] <- renderUI(HTML(generate_icon_array(counts=c(yellow, red, green))))
-          output[[paste0(oc,"_icon_array_legend")]] <- renderUI(HTML(xxx()))
-        })
-      })
-    }
+        output$specific_outcome_content <- renderUI(create_specific_coutcome_content(pfl(), input$specific_outcome_selector)) #Just in case the content might be different per outcome, we are 'creating things' on the fly
+      }
+    })
+
+
+    observeEvent(input$specific_outcome_before,
+    {
+      outcome <- get_outcomes()[input$specific_outcome_selector]
+      risk_before <- input$specific_outcome_before/100
+      risk_after <- risk_before*calculate_risk(pfl(),outcome)
+      updateProgressBar(id="specific_outcome_after",value=risk_after*100)
+      yellow <- round(risk_before*100)
+      red <- round(risk_after*100) - yellow
+      green <- 100 - red - yellow
+      output$specific_outcome_icon_array <- renderUI(HTML(generate_icon_array(counts=c(yellow, red, green))))
+      output$specific_outcome_icon_array_legend <- renderUI(HTML(generate_icon_array_legend()))
+    })
+
+
 
 
     #output$icon_array <- renderText(HTML(generate_icon_array()))

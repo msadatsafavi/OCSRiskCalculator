@@ -49,7 +49,7 @@ create_bar_plot <- function(profile, outcomes)
   plt <- ggplot(data=df,aes(x=outcome, y=(rr-1)*100))+
     xlab("")+ylab("Percent Increase")+
     geom_bar(stat="identity")+
-    geom_text(aes(label=label), hjust=-0.1, vjust=0.5, color="orange", size=7)+
+    geom_text(aes(label=label), hjust=-0.1, vjust=0.5, color="#e37705", size=7)+
     theme(axis.text=element_text(size=20))+
     geom_hline(yintercept=1, linetype="dashed", color = "orange", size=0.5)+
     coord_flip(ylim=c(0,115))+
@@ -60,7 +60,7 @@ create_bar_plot <- function(profile, outcomes)
     str <- paste(readLines(tf1), collapse="\n")
     for(outcome_name in names(outcomes))
     {
-      str <- str_replace(str, outcome_name, paste("<a onclick='Shiny.setInputValue(\"outcome_clicked\", \"",outcome_name,"\"); return(false);' href='http://", outcome_name, ".com'>", outcome_name,"</a>"))
+      str <- str_replace(str, outcome_name, paste0("<a onclick='Shiny.setInputValue(\"outcome_clicked\", \"",outcome_name,"\"); return(false);' href='http://", outcome_name, ".com'>", outcome_name,"</a>"))
     }
     writeLines(str, tf1)
 

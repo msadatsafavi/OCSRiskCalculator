@@ -28,8 +28,26 @@ evidence <- list(
     tbs=c(cur_ocs_low=log(0.915), cur_ocs_high=log(1.151), hist_ocs_low_years=log(1.030), hist_ocs_high_years=log(1.126)),
     ctc=c(cur_ocs_low=log(0.943), cur_ocs_high=log(1.256), hist_ocs_low_years=log(1.061), hist_ocs_high_years=log(1.026)),
     glc=c(cur_ocs_low=log(0.921), cur_ocs_high=log(1.040), hist_ocs_low_years=log(1.009), hist_ocs_high_years=log(0.959))
+  ),
+
+  no_ocs_py = 72063*2.9,
+
+  no_ocs_n_events = list(
+    ost=4100,
+    mbs=531,
+    htn=7818,
+    obs=5039,
+    dm2=3424,
+    ctc=1500,
+    avn=63,
+    dlp=7322,
+    gib=3290,
+    frc=3459,
+    tbs=2023,
+    glc=1310
+    )
   )
-)
+
 
 
 
@@ -49,9 +67,11 @@ get_outcomes <- function()
 }
 
 
+
 #' @export
-calculate_risk <- function(profile, outcome)
+calculate_risk <- function(profile, outcome) #THIS IS RR
 {
+  evidence <- get_evidence()
   coeffs <- evidence$ocs_coefficients[[outcome]]
   profile <- as.list(profile)
   pf <- c(cur_ocs_low=profile$cur_ocs*(profile$ocs_intensity==0),
@@ -61,3 +81,16 @@ calculate_risk <- function(profile, outcome)
 
   exp(sum(pf[names(coeffs)]*coeffs))
 }
+
+
+#' @export
+calculate_baseline_risk <- function(profile, outcome, years=10)
+{
+  evidence <- get_evidence()
+  rate <- unlist(evidence$no_ocs_n_events)[outcome]/evidence$no_ocs_py
+
+  1-exp(-rate*years)
+}
+
+
+

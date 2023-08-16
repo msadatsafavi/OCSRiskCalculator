@@ -5,28 +5,38 @@ outcome_descs <-
   )
 
 
-create_single_page <- function(outcome)
+create_specific_coutcome_content <- function(profile, outcome_name)
 {
-  outcomes <- get_outcomes()
-  outcome_name <- names(which(outcomes==outcome))
+  outcome <- get_outcomes()[outcome_name]
   outcome_desc <- outcome_descs[outcome]
-  list(
-    h3(paste0("In this page, we evaluate the risk of specific outcome (",outcome_name,")")),
-    h4(ifelse(is.null(outcome_desc),"",outcome_desc)),
+  bg_risk <- calculate_baseline_risk(NULL, outcome)
+  content <- list(
+    h4("You have selected the following outcome:", span(style="color:red;", outcome_name)),
+    h4(style="border:1px;", ifelse(is.null(outcome_desc),"",outcome_desc)),
+    h4("In the study by Sullivan et al, the 10-year risk of this outcome in individuals who are not taking oral corticosteroids was approximately",
+       span(style="color:red;", round(bg_risk*100),"%")),
+    h4("The risk ratio for this outcome is ",
+       span(style="color:red;", round(calculate_risk(profile ,outcome),2))),
     hr(),
-    sliderInput(paste0(outcome,"_before"),label="Risk without using oral corticosteroids*",min=0,max=100, value=50),
-    span("*Your background risk should be estimated after consulting with your care provider.", style="font-style:italic;"),
+    div(
+      span(style="float:left;", sliderInput("specific_outcome_before",label="Risk without using oral corticosteroids*",min=0,max=100, value=bg_risk*100)),
+      br(),br(),span(style="color:red; margin-top:100px", "  *Your background risk should be estimated after consulting with your care provider.", style="font-style:italic;")),
+    br(),
     hr(),
-    progressBar(paste0(outcome,"_after"), value = 0, title = "Risk with using oral corticosteroids", display_pct = TRUE, status = "danger", striped = TRUE),
-    uiOutput(paste0(outcome,"_icon_array"), inline=T),
-    uiOutput(paste0(outcome,"_icon_array_legend"),inline=T)
+    progressBar("specific_outcome_after", value = 0, title = "Risk with using oral corticosteroids", display_pct = TRUE, status = "danger", striped = TRUE),
+    hr(),
+    div(
+      div(style='float:left; width:250px;', uiOutput("specific_outcome_icon_array", inline=T)),
+      div(style="margin-left:10px;margin-top:100px;float:left;", uiOutput("specific_outcome_icon_array_legend",inline=T)),
+      div(style="margin-left:10px;float:left; border:solid; height:250px;", "This icon array presents the ")
+      )
   )
 }
 
-xxx<-function()
+generate_icon_array_legend <- function()
 {
-  out <- paste("","<TABLE><TR><TD style='width:20pt;'>",faces['yellow'],"</TD><TD>General (background) risk</TD></TR>")
-  out <- paste(out,"<TABLE><TR><TD style='width:20pt;'>",faces['red'],"</TD><TD>Risk due to oral corticosteroid use</TD></TR>")
+  out <- paste("","<TABLE><TR><TD style='width:20pt;'>",faces['yellow'],"</TD><TD>Risk without taking oral corticosteroi</TD></TR>")
+  out <- paste(out,"<TABLE><TR><TD style='width:20pt;'>",faces['red'],"</TD><TD>Extra risk due to taking oral corticosteroid</TD></TR>")
   out <- paste(out,"<TABLE><TR><TD style='width:20pt;'>",faces['green'],"</TD><TD>Not at risk</TD></TR></TABLE>")
 
   out
@@ -44,7 +54,7 @@ generate_icon_array <- function(order=c('yellow','red','green'),counts=c(50,30,2
   x <- c(rep(faces[order[1]],counts[1]),
          rep(faces[order[2]],counts[2]),
          rep(faces[order[3]],counts[3]))
-  out <- "<TABLE style='width:300px;margin:0;padding:0;display:inline-table'><TBODY>"
+  out <- "<TABLE style='width:100%; margin:0;padding:0;display:inline-table'><TBODY>"
   for(i in 1:10)
   {
     out <- paste(out,"<TR>")
