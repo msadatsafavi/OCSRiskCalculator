@@ -1,6 +1,8 @@
 library(shiny)
 library(shinyWidgets)
 library(OCSRiskCalculator)
+library(svglite)
+library(stringr)
 
 source("single_page.R")
 source("summary_page.R")
