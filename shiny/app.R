@@ -98,7 +98,6 @@ shinyApp(
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
     ),
-    print(paste("Server version: 0.3 (2023.08.15)")),
     titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator",align="center")),
     sidebarLayout(
       sidebarPanel(id="input_panel",
@@ -133,12 +132,13 @@ shinyApp(
                              h3(paste0("In this page, we evaluate the risk of specific outcomes")),
                              selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
                              uiOutput("specific_outcome_content")),
-                    tabPanel("About")),
+                    tabPanel("About", includeMarkdown("About.html"))),
       )),
     tags$script(src="app.js"),
     hr(),
     div(id="footer",
-        a(id="about_button","About this calculator")
+        div("By NAPTIA Consultation"),
+        div(print(paste("Server version: 0.3 (2023.08.15)")))
         )
   ),
 
@@ -257,10 +257,6 @@ shinyApp(
       output$specific_outcome_icon_array_legend <- renderUI(HTML(generate_icon_array_legend()))
     })
 
-
-
-
-    #output$icon_array <- renderText(HTML(generate_icon_array()))
   }
 )
 

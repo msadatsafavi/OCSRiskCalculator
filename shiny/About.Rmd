@@ -1,0 +1,60 @@
+---
+title: "About this web app"
+output: html_document
+date: "2023-08-16"
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+library(OCSRiskCalculator)
+evidence <- get_evidence()
+outcomes <- get_outcomes()
+```
+
+The purpose of this project is to create a Web App for quantifying the relative risk of long-term oral corticosteroid (OCS) use in patients with asthma.
+
+Based on a careful review of the literature, we have selected the paper by [Sullivan et al, ](http://dx.doi.org/10.1016/j.jaci.2017.04.009). This is a rigorous retrospective cohort study with a large sample size from the US.
+
+
+### Regression coefficients:
+Table below presents the log-RR associated with each outcome. 
+The interpretation of coefficients are as follows:
+
+* Reference: not currently taking OCS, and not havng any history of OCS use
+* cur_ocs_low: Whether the individual is taking low-dose OCS
+* cur_ocs_high: Whether the individual is taking low-dose OCS
+* hist_ocs_low_years: Number of previous years where the patient was taking low-dose OCS
+* hist_ocs_high_years:  Number of previous years where the patient was taking high-dose OCS
+
+```{r echo=FALSE}
+df <- t(as.data.frame(evidence$ocs_coefficients))
+o <- which(outcomes==rownames(df))
+df <- df[o,]
+rownames(df) <- names(outcomes)
+
+kable(df)
+```
+
+In mapping these coefficients to person characteristics, in consultation with the sponsor, we makde the following simplified assumption: 
+* We are asking one question about generally if the person has been taking low-dose or high-dose OCS. We then apply this response to both current and historical use. This is because remembering the nuances of OCS use over the years might be fraught with inaccuracy
+
+
+
+### Calculating rerlative risk
+
+The equation for calculating RR is
+
+$$ RR = exp(\beta_0X_0+\beta_1X_1+\beta_2X_2+\beta_3X_3) $$
+where indices 0-3 refer to the four exposure variables as in the table above.
+
+
+
+### Baseline risk
+Estimating the baseline risk of events for the patient is out of the scope of this web application. Instead, for specific outcomes, this web app let's the user indicate their own baseline risk as if they have never taken OCS (typically after consultation with their care provider) and then evaluate the added risk given the specified OCS exposure profile.
+
+However, the slider for baseline risk is pre-populated with the 10-year incidence of outcomes in the comparison group (those who did not take OCS) as reported by Sullivan et al. This is only a suggested default value. If the user profiel is significantly different from the baseline characteristics of the copmparison cohort in Sullivan et al' study, this risk estimate can be substantially biased.
+
+
+### Contact us
+
