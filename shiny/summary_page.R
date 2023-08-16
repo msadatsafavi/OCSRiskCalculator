@@ -20,7 +20,7 @@ create_bar_plot <- function(profile, outcomes)
   rrs <- rep(NA,length(outcomes))
   for(i in 1:length(outcomes))
   {
-    rrs[i] <- calculate_risk(profile,outcomes[i])
+    rrs[i] <- OCSRiskCalculator::calculate_risk(profile,outcomes[i])
   }
 
   labels <- sapply(rrs, function(x)
