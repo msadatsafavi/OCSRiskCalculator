@@ -3,9 +3,11 @@ library(shinyWidgets)
 library(OCSRiskCalculator)
 library(svglite)
 library(stringr)
+library(markdown)
 
-source("single_page.R")
 source("summary_page.R")
+source("specific_outcome_page.R")
+
 
 
 time_range_map <- c(
