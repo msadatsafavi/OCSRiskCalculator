@@ -34,7 +34,7 @@ create_specific_coutcome_content <- function(profile, outcome_name)
       div(style="border:solid; color:gray; float:left; width:100%;",
         span(style='float:left; width:250px;', uiOutput("specific_outcome_icon_array", inline=T)),
         span(style="margin-left:10px;margin-top:100px;float:left;", uiOutput("specific_outcome_icon_array_legend",inline=T)),
-        span(style="margin-left:10px;float:left; height:250px;", "This icon array presents the ")
+        span(style="margin-left:10px;float:left; height:250px;", "") #TODO
         )
     )
   }

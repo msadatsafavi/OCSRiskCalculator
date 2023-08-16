@@ -98,6 +98,7 @@ shinyApp(
     "),
     shinyjs::useShinyjs(),
     tags$head(
+      HTML("<title>Oral corticosteroid risk calculator</title>"),
       tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
     ),
     titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator",align="center")),
@@ -250,7 +251,7 @@ shinyApp(
     {
       outcome <- get_outcomes()[input$specific_outcome_selector]
       risk_before <- input$specific_outcome_before/100
-      risk_after <- risk_before*calculate_risk(pfl(),outcome)
+      risk_after <- min(risk_before*calculate_risk(pfl(),outcome),1)
       updateProgressBar(id="specific_outcome_after",value=risk_after*100)
       yellow <- round(risk_before*100)
       red <- round(risk_after*100) - yellow
