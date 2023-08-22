@@ -4,11 +4,20 @@ library(OCSRiskCalculator)
 library(svglite)
 library(stringr)
 library(markdown)
+library(bslib)
+library(bsicons)
 
 source("summary_page.R")
 source("specific_outcome_page.R")
 
-
+custom_theme <- bs_theme(
+  version = 5,
+  bg = "#FFFFFF",
+  fg = "#000000",
+  primary = "#0199F8",
+  secondary = "#FF374B",
+  base_font = "Maven Pro"
+)
 
 time_range_map <- c(
   "<1 year"=0,
@@ -33,11 +42,13 @@ start_here_innerHTML <- '<h1>← Start Here</h1>
                         <p>For a detailed description of the tool, please refer to the <a href="https://doi.org/10.1016/S2213-2600%2819%2930397-2">About page</a>.</p>'
 
 
-shinyApp(
+run_with_themer(
+  shinyApp(
   ui = fluidPage(
+    theme = custom_theme,
     tags$style(
     "
-    #summary_desc {
+    #summary_desc_temp {
       border-width:1px;
       border-style:solid;
       border-color:#959595;
@@ -46,36 +57,36 @@ shinyApp(
       color: white;
     }
 
-    #summary_plot {
+    #summary_plot_temp {
       border-width:1px;
       background-color: #d8eaf5;
     }
 
-    #high_dose_desc {
+    #high_dose_desc_temp {
       border-width:1px;
       border-style:solid;
       border-color:#959595;
       font-style: italic;
     }
 
-    .container-fluid {
+    .container-fluid_temp {
       background-color: #d8eaf5;
     }
 
-    .nav-tabs {
+    .nav-tabs_temp {
       font-size: 20px;
     }
 
-    body {
+    body_temp {
       background-color: #d8eaf5;
     }
 
-    #input_panel {
+    #input_panel_temp {
       background-color: white;
       font-size: 20px;
     }
 
-    #title_panel {
+    #title_panel_temp {
       background-color: #8b3972;
       color: white;
       height: 80px;
@@ -83,7 +94,7 @@ shinyApp(
       border: 3px solid #eea342;
     }
 
-    #about_button {
+    #about_button_temp {
       background-color: white;
       color: #0e406a;
       border: 3px solid #0e406a;
@@ -91,7 +102,7 @@ shinyApp(
       font-size: 20px;
     }
 
-    #footer {
+    #footer_temp {
       text-align: center;
     }
 
@@ -135,7 +146,8 @@ shinyApp(
                              h3(paste0("In this page, we evaluate the risk of specific outcomes")),
                              selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
                              uiOutput("specific_outcome_content")),
-                    tabPanel("About", includeMarkdown("About.html"))),
+                    tabPanel("About", includeMarkdown("About.html")),
+                    ),
       )),
     tags$script(src="app.js"),
     hr(),
@@ -252,7 +264,9 @@ shinyApp(
       outcome <- get_outcomes()[input$specific_outcome_selector]
       risk_before <- input$specific_outcome_before/100
       risk_after <- min(risk_before*calculate_risk(pfl(),outcome),1)
-      updateProgressBar(id="specific_outcome_after",value=risk_after*100)
+      updateProgressBar(id="pb_specific_outcome_before",value=risk_before*100)
+      updateProgressBar(id="pb_specific_outcome_after",value=(risk_after-risk_before)*100)
+
       yellow <- round(risk_before*100)
       red <- round(risk_after*100) - yellow
       green <- 100 - red - yellow
@@ -262,7 +276,5 @@ shinyApp(
 
   }
 )
-
-
-
+)
 

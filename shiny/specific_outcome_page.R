@@ -29,7 +29,19 @@ create_specific_coutcome_content <- function(profile, outcome_name)
         br(),br(),span(style="color:red; margin-top:100px", "  *Your background risk should be estimated after consulting with your care provider.", style="font-style:italic;")),
       br(),
       hr(),
-      progressBar("specific_outcome_after", value = 0, title = "Risk with using oral corticosteroids", display_pct = TRUE, status = "danger", striped = TRUE),
+      #progressBar("specific_outcome_after", value = 0, title = "Risk with using oral corticosteroids", display_pct = TRUE, status = "danger", striped = TRUE),
+      HTML("<div class='progress'>
+              <div id='pb_specific_outcome_before' class='progress-bar progress-bar-striped' role='progressbar' style='width: 15%; height: 20px; aria-valuenow='15' aria-valuemin='0' aria-valuemax='100'>15</div>
+              <div id='pb_specific_outcome_after' class='progress-bar progress-bar-striped progress-bar-animated bg-danger' role='progressbar' style='width: 30%' aria-valuenow='30' aria-valuemin='0' aria-valuemax='100'>30</div>
+            </div>"),
+      HTML("Legend:<BR/>"),
+      HTML("<div class='progress' style='width:250px; float:left;'>
+              <div class='progress-bar progress-bar-striped' role='progressbar' style='width: 100%; aria-valuenow='100' aria-valuemin='0' aria-valuemax='100'>Risk without oral corticosteroids</div>
+            </div>
+           <div class='progress'  style='width:250px; margin:left; '>
+              <div class='progress-bar progress-bar-striped progress-bar-animated bg-danger' role='progressbar' style='width: 100%; aria-valuenow='100' aria-valuemin='0' aria-valuemax='100'>Added risk with oral corticosteroids</div>
+            </div>
+           "),
       hr(),
       div(style="border:solid; color:gray; float:left; width:100%;",
         span(style='float:left; width:250px;', uiOutput("specific_outcome_icon_array", inline=T)),
