@@ -19,6 +19,8 @@ custom_theme <- bs_theme(
   base_font = "Maven Pro"
 )
 
+bs_theme_update(custom_theme, preset = "flatly")
+
 time_range_map <- c(
   "<1 year"=0,
   "1-2 years"=1.5,
