@@ -1,14 +1,13 @@
 generate_summary_text <- function()
 {
   HTML("
-  <P><B>About this bar chart</B></P>
+  <DIV class='text-primary-emphasis'><P><B>About this bar chart</B></P>
       The bar chart above demonstrates the <B>Risk Ratio</B>:
        the ratio of risk of outcomes between someone with exposure to oral corticosteroids to the same person,
        had they not taken any oral corticosteroids.
        For example, a risk ratio of 50% for diabetes indicates that
        a person with this history of oral corticosteroid use has 50% higher risk of developing diabetes compared with a person of similar age and sex
-       but without having used any oral corticosteroids.
-
+       but without having used any oral corticosteroids.</DIV>
        ")
 }
 
