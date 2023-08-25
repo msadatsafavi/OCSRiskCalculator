@@ -10,18 +10,18 @@ library(bsicons)
 source("summary_page.R")
 source("specific_outcome_page.R")
 
-theme_selector <- T
+theme_selector <- F
 
-custom_theme <- bs_theme(
-  version = 5,
-  bg = "#FFFFFF",
-  fg = "#000000",
-  primary = "#0199F8",
-  secondary = "#FF374B",
-  base_font = "Maven Pro"
+ custom_theme <- bs_theme(
+   version = 5,
+#   bg = "#e0f3db",
+#   fg = "#000000",
+#   primary = "#0199F8",
+#   secondary = "#FF374B",
+#   base_font = "Calibri"
 )
 
-bs_theme_update(custom_theme, preset = "flatly")
+custom_theme <- bs_theme_update(custom_theme, preset = "shiny")
 
 time_range_map <- c(
   "<1 year"=0,
@@ -55,14 +55,12 @@ ui <- fluidPage(
     border-width:1px;
     border-style:solid;
     border-color:#959595;
-    background-color: #0e406a;
     font-size: 20px;
-    color: white;
   }
 
   #summary_plot {
     border-width:1px;
-    background-color: #d8eaf5;
+    background-color: #ffffff;
   }
 
   #high_dose_desc {
@@ -73,7 +71,7 @@ ui <- fluidPage(
   }
 
   .container-fluid {
-    background-color: #d8eaf5;
+    background-color: white;
   }
 
   .nav-tabs {
@@ -81,23 +79,24 @@ ui <- fluidPage(
   }
 
   body {
-    background-color: #d8eaf5;
+    background-color: white;
   }
 
   #input_panel {
-    background-color: white;
     font-size: 20px;
+    background-color: #e0f3db;
   }
 
   #title_panel {
     height: 80px;
     text-align: center;
     padding: 20px;
+    background-color: #404040;
+    color: white;
   }
 
   #footer {
     text-align: center;
-    background-color: white;
   }
 
   "),
@@ -106,7 +105,7 @@ ui <- fluidPage(
     HTML("<title>Oral corticosteroid risk calculator</title>"),
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
-  titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator", align="center", class="navbar navbar-expand-lg bg-primary")),
+  titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator")),
   sidebarLayout(
     sidebarPanel(id="input_panel",
        radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
@@ -140,14 +139,14 @@ ui <- fluidPage(
                            h3(paste0("In this page, we evaluate the risk of specific outcomes")),
                            selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
                            uiOutput("specific_outcome_content")),
-                  tabPanel("About", includeMarkdown("About.html")),
+                  tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:700px;')),
                   ),
     )),
   tags$script(src="app.js"),
   hr(),
   div(id="footer",
       div("By NAPTIA Consultation"),
-      div(print(paste("App version: 0.4 (2023.08.22)")))
+      div(print(paste("App version: 0.5 (2023.08.24)")))
       )
 )
 

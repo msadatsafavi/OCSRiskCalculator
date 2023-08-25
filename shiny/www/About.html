@@ -235,6 +235,7 @@ span.underline{text-decoration: underline;}
 div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
 </style>
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -367,7 +368,7 @@ sample size from the US.</p>
 <p>Table below presents the log-RR associated with each outcome. The
 interpretation of coefficients are as follows:</p>
 <ul>
-<li>Reference: not currently taking OCS, and not havng any history of
+<li>Reference: not currently taking OCS, and not having any history of
 OCS use</li>
 <li>cur_ocs_low: Whether the individual is taking low-dose OCS</li>
 <li>cur_ocs_high: Whether the individual is taking low-dose OCS</li>
@@ -490,9 +491,9 @@ nuances of OCS use over the years might be fraught with inaccuracy</p>
 <div id="calculating-rerlative-risk" class="section level3">
 <h3>Calculating rerlative risk</h3>
 <p>The equation for calculating RR is</p>
-<p><span class="math display">\[ RR =
-exp(\beta_0X_0+\beta_1X_1+\beta_2X_2+\beta_3X_3) \]</span> where indices
-0-3 refer to the four exposure variables as in the table above.</p>
+<p><span class="math display"><em>R</em><em>R</em> = <em>e</em><em>x</em><em>p</em>(<em>β</em><sub>0</sub><em>X</em><sub>0</sub>+<em>β</em><sub>1</sub><em>X</em><sub>1</sub>+<em>β</em><sub>2</sub><em>X</em><sub>2</sub>+<em>β</em><sub>3</sub><em>X</em><sub>3</sub>)</span>
+where indices 0-3 refer to the four exposure variables as in the table
+above.</p>
 </div>
 <div id="baseline-risk" class="section level3">
 <h3>Baseline risk</h3>
@@ -548,15 +549,6 @@ $(document).ready(function () {
 <!-- code folding -->
 
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
 
 </body>
 </html>

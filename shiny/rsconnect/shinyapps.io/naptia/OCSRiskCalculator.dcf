@@ -5,7 +5,7 @@ account: naptia
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9409184
-bundleId: 7598130
+bundleId: 7607392
 url: https://naptia.shinyapps.io/OCSRiskCalculator/
 asMultiple: FALSE
 asStatic: FALSE
