@@ -111,11 +111,23 @@ ui <- fluidPage(
 
   tabsetPanel(id="master_panel", type="hidden",
     tabPanel("welcome_panel",
-       tags$iframe(src=("Welcome.html"),
-       style='width:100%; height:700px;'),
-       checkboxInput("consent0","I understand the purpose of this tool"),
-       textOutput("need_to_consent0"),
-       actionButton("make_app_visible","Go to the app!")),
+      tags$iframe(src=("Welcome.html"), style="width:100%; height:50vh"),
+      hr(),
+      fluidRow(
+        column(4,
+          checkboxInput("consent0","I understand the purpose of this tool", width="100%"),
+          textOutput("need_to_consent0"),
+          tags$head(tags$style("#need_to_consent0{color: red;
+                                 font-size: 20px;
+                                 font-style: italic;
+                                 }"))
+        ),
+        column(4,
+          fluidRow(actionButton("make_app_visible","Go to the app!"))
+        ),
+        column(4)
+      )
+    ),
     tabPanel("app_panel",
       sidebarLayout(
         sidebarPanel(id="input_panel",
@@ -132,7 +144,7 @@ ui <- fluidPage(
           ,radioButtons("ocs_intensity","Generally, your oral corticosteroids use has been:", choices=c("Low"=0, "High"=1))
           ,p(id="high_dose_desc", "Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
           ,hr()
-          ,checkboxInput("consent","This tool should be discussed with a provider")
+          ,div("This tool should be discussed with a provider")
           ,actionButton("calculate","Calculate!")
           ,actionButton("reset","Restart")
           ,textOutput("need_to_consent")
@@ -271,6 +283,7 @@ server <- function(input, output, session)
 
     output$specific_outcome_content <- renderUI("")
     shinyjs::disable("specific_outcome_selector")
+    updateTabsetPanel(session, inputId="main_panel", selected="Summary")
   })
 
 
