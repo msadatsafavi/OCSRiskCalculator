@@ -39,15 +39,13 @@ time_range_map <- c(
 
 
 
-start_here_innerHTML <- '<h1>← Start Here</h1>
-                        <p>Enter your data in the left panel and press “Calculate” after agreeing with the terms</p>
-                        <p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. None of the variables on the left panel have a causal interpretation in the model. Changing them for a single patient to estimate the effect of an intervention would be misleading and should be avoided.  </span>
-                        <br></p>
-                        <p>For a detailed description of the tool, please refer to the About page on top</a>.</p>'
+start_here_innerHTML <- '<h1 style="color:tomato">← Start Here</h1>
+                        <p>Enter your data in the left panel and press “Calculate” after agreeing with the terms</p>'
 
 
 ui <- fluidPage(
   theme = custom_theme,
+
   tags$style(
 
   "
@@ -99,54 +97,69 @@ ui <- fluidPage(
     text-align: center;
   }
 
+
   "),
+
   shinyjs::useShinyjs(),
+
   tags$head(
     HTML("<title>Oral corticosteroid risk calculator</title>"),
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
+
   titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator")),
-  sidebarLayout(
-    sidebarPanel(id="input_panel",
-       radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
-      #,sliderInput("ocs_years", label="Number of years taking oral corticosteroids:", min=1, max=10, value=1, width="50%")
-      ,hr()
-      ,sliderTextInput(
-        inputId = "ocs_years",
-        label = "Number of years taking oral corticosteroids:",
-        choices = names(time_range_map),
-        selected = names(time_range_map)[5]
-      )
-      ,hr()
-      ,radioButtons("ocs_intensity","Generally, your oral corticosteroids dose has been:", choices=c("Low"=0, "High"=1))
-      ,p(id="high_dose_desc", "Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
-      ,hr()
-      ,checkboxInput("consent","I understand the risks of using this tool")
-      ,actionButton("calculate","Calculate!")
-      ,actionButton("reset","Restart")
-      ,textOutput("need_to_consent")
-      ,tags$head(tags$style("#need_to_consent{color: red;
-                               font-style: bold;
-                               }"
+
+  tabsetPanel(id="master_panel", type="hidden",
+    tabPanel("welcome_panel",
+       tags$iframe(src=("Welcome.html"),
+       style='width:100%; height:700px;'),
+       checkboxInput("consent0","I understand the purpose of this tool"),
+       textOutput("need_to_consent0"),
+       actionButton("make_app_visible","Go to the app!")),
+    tabPanel("app_panel",
+      sidebarLayout(
+        sidebarPanel(id="input_panel",
+           radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
+          #,sliderInput("ocs_years", label="Number of years taking oral corticosteroids:", min=1, max=10, value=1, width="50%")
+          ,hr()
+          ,sliderTextInput(
+            inputId = "ocs_years",
+            label = "Number of years taking oral corticosteroids:",
+            choices = names(time_range_map),
+            selected = names(time_range_map)[5]
+          )
+          ,hr()
+          ,radioButtons("ocs_intensity","Generally, your oral corticosteroids use has been:", choices=c("Low"=0, "High"=1))
+          ,p(id="high_dose_desc", "Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
+          ,hr()
+          ,checkboxInput("consent","This tool should be discussed with a provider")
+          ,actionButton("calculate","Calculate!")
+          ,actionButton("reset","Restart")
+          ,textOutput("need_to_consent")
+          ,tags$head(tags$style("#need_to_consent{color: red;
+                                   font-style: bold;
+                                   }"
+            )
+          )
         )
-      )
-    )
-    ,mainPanel(
-      textOutput("profile"),
-      tabsetPanel(id="main_panel",
-                  tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")),
-                  tabPanel("Specific outcome",
-                           h3(paste0("In this page, we evaluate the risk of specific outcomes")),
-                           selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
-                           uiOutput("specific_outcome_content")),
-                  tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:700px;')),
-                  ),
-    )),
+
+        ,mainPanel(
+
+          textOutput("profile"),
+          tabsetPanel(id="main_panel",
+                      tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")),
+                      tabPanel("Specific outcome",
+                               h3(paste0("In this page, we evaluate the risk of specific outcomes")),
+                               selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
+                               uiOutput("specific_outcome_content")),
+                      tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:700px;')),
+                      ),
+        )))),
   tags$script(src="app.js"),
   hr(),
   div(id="footer",
       div("By NAPTIA Consultation"),
-      div(print(paste("App version: 0.5 (2023.08.24)")))
+      div(print(paste("App version: 1 (2023.12.09)")))
       )
 )
 
@@ -171,13 +184,14 @@ server <- function(input, output, session)
 
   shinyjs::disable("specific_outcome_selector") #when first started this should be disabled
 
-  # panels <- list(tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")))
-  # for(i in 1:2)
-  # {
-  #   panels[[i+1]] <- tabPanel(names(outcomes)[i], htmlOutput(paste0("details_", outcomes[i]), inline=T, fill=F))
-  #
-  # }
-  # output$main <- renderUI(do.call(tabsetPanel,args=panels))
+  # observeEvent(once = TRUE,ignoreNULL = FALSE, ignoreInit = FALSE, eventExpr = c(), {
+  #   showModal(modalDialog(
+  #     title = "Welcome!",
+  #     h1("Salam")
+  #   ))
+  # })
+
+
 
   output$start_here <- renderUI(HTML(start_here_innerHTML))
 
@@ -191,8 +205,35 @@ server <- function(input, output, session)
 
   output$profile <- renderText(pfl())
 
+  observeEvent(input$make_app_visible,
+   {
+     if(isolate(input$consent0))
+     {
+       updateTabsetPanel(session, inputId="master_panel", selected="app_panel")
+     }
+     else
+     {
+       output$need_to_consent0 <- renderText("Please consent to use this tool")
+     }
+
+   })
+
+  observeEvent(input$know_my_bg_risk, {
+    if(input$know_my_bg_risk)
+    {
+      shinyjs::show("div_know_my_bg_risk", anim=T)
+    }
+    else
+    {
+      shinyjs::hide("div_know_my_bg_risk", anim=F)
+    }
+
+
+    })
+
   observeEvent(input$calculate, {
-    if(isolate(input$consent))
+    #if(isolate(input$consent))
+    if(T)
     {
       plt <- create_bar_plot(profile=pfl(), outcomes=outcomes)
       output$summary_plot <- renderUI(HTML(plt))
@@ -250,6 +291,8 @@ server <- function(input, output, session)
     if(input$specific_outcome_selector!="PLEASE SELECT")
     {
       output$specific_outcome_content <- renderUI(create_specific_coutcome_content(pfl(), input$specific_outcome_selector)) #Just in case the content might be different per outcome, we are 'creating things' on the fly
+      updateCheckboxInput(inputId="know_my_bg_risk",value=F)
+      #shinyjs::hide("div_know_my_bg_risk")
     }
   })
 
@@ -265,8 +308,8 @@ server <- function(input, output, session)
     yellow <- round(risk_before*100)
     red <- round(risk_after*100) - yellow
     green <- 100 - red - yellow
-    output$specific_outcome_icon_array <- renderUI(HTML(generate_icon_array(counts=c(yellow, red, green))))
-    output$specific_outcome_icon_array_legend <- renderUI(HTML(generate_icon_array_legend()))
+    # output$specific_outcome_icon_array <- renderUI(HTML(generate_icon_array(counts=c(yellow, red, green))))
+    # output$specific_outcome_icon_array_legend <- renderUI(HTML(generate_icon_array_legend()))
   })
 
 }
