@@ -50,6 +50,7 @@ create_bar_plot <- function(profile, outcomes)
     geom_bar(stat="identity", fill="#43a2ca")+
     geom_text(aes(label=label), hjust=-0.1, vjust=0.5, color="#636363", size=7)+
     theme(axis.text=element_text(size=20))+
+    theme(text=element_text(size=16,  family="Calibri"))+
     geom_hline(yintercept=1, linetype="dashed", color = "orange", size=0.5)+
     coord_flip(ylim=c(0,115))+
     theme(axis.title=element_text(size=20,face="bold"),  plot.background = element_rect(fill = "#ffffff"),

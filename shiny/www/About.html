@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2023-12-09" />
+<meta name="date" content="2023-08-16" />
 
-<title>Welcome</title>
+<title>About this web app</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,37 +350,165 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Welcome</h1>
-<h4 class="date">2023-12-09</h4>
+<h1 class="title toc-ignore">About this web app</h1>
+<h4 class="date">2023-08-16</h4>
 
 </div>
 
 
-<p>Welcome to this Web App!</p>
-<p>This Web app helps individuals who are using, or having using oral
-corticosteroids, to calculate their risk of adverse outcomes.</p>
-<p>All the calculations in this application are based on a 2018 study in
-the Journal of Allergy and Clinical Immunology, by Sullivan and
-colleagues (<a href="http://dx.doi.org/10.1016/j.jaci.2017.04.009">Click
-here to access the publication poge</a>.</p>
-<div id="things-to-remember" class="section level3">
-<h3>Things to remember</h3>
-<div id="this-web-app-must-be-used-in-consultation-with-your-care-provider" class="section level4">
-<h4>This web app must be used in consultation with your care
-provider</h4>
+<p>The purpose of this project is to create a Web App for quantifying
+the relative risk of long-term oral corticosteroid (OCS) use in patients
+with asthma.</p>
+<p>Based on a careful review of the literature, we have selected the
+paper by <a href="http://dx.doi.org/10.1016/j.jaci.2017.04.009">Sullivan
+et al,</a>. This is a rigorous retrospective cohort study with a large
+sample size from the US.</p>
+<div id="regression-coefficients" class="section level3">
+<h3>Regression coefficients:</h3>
+<p>Table below presents the log-RR associated with each outcome. The
+interpretation of coefficients are as follows:</p>
+<ul>
+<li>Reference: not currently taking OCS, and not having any history of
+OCS use</li>
+<li>cur_ocs_low: Whether the individual is taking low-dose OCS</li>
+<li>cur_ocs_high: Whether the individual is taking low-dose OCS</li>
+<li>hist_ocs_low_years: Number of previous years where the patient was
+taking low-dose OCS</li>
+<li>hist_ocs_high_years: Number of previous years where the patient was
+taking high-dose OCS</li>
+</ul>
+<table>
+<colgroup>
+<col width="32%" />
+<col width="12%" />
+<col width="13%" />
+<col width="20%" />
+<col width="21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">cur_ocs_low</th>
+<th align="right">cur_ocs_high</th>
+<th align="right">hist_ocs_low_years</th>
+<th align="right">hist_ocs_high_years</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Osteoporosis</td>
+<td align="right">0.0468836</td>
+<td align="right">0.3660310</td>
+<td align="right">0.0852598</td>
+<td align="right">0.1292723</td>
+</tr>
+<tr class="even">
+<td align="left">Fractures</td>
+<td align="right">0.0732505</td>
+<td align="right">0.1889661</td>
+<td align="right">0.0723207</td>
+<td align="right">0.0695261</td>
+</tr>
+<tr class="odd">
+<td align="left">Metabolic syndrome</td>
+<td align="right">-0.1415636</td>
+<td align="right">-0.1719753</td>
+<td align="right">0.0372958</td>
+<td align="right">-0.0833816</td>
+</tr>
+<tr class="even">
+<td align="left">Hypertension</td>
+<td align="right">0.0544882</td>
+<td align="right">0.2806575</td>
+<td align="right">0.0610951</td>
+<td align="right">0.0741794</td>
+</tr>
+<tr class="odd">
+<td align="left">Obesity</td>
+<td align="right">0.0217615</td>
+<td align="right">0.2468601</td>
+<td align="right">0.0685928</td>
+<td align="right">0.0610951</td>
+</tr>
+<tr class="even">
+<td align="left">Type 2 diabetes</td>
+<td align="right">-0.0222456</td>
+<td align="right">0.2615947</td>
+<td align="right">0.0382587</td>
+<td align="right">0.0305292</td>
+</tr>
+<tr class="odd">
+<td align="left">Dyslipidemia</td>
+<td align="right">0.0344014</td>
+<td align="right">0.0363319</td>
+<td align="right">0.0392207</td>
+<td align="right">0.0449734</td>
+</tr>
+<tr class="even">
+<td align="left">Avascular necrosis</td>
+<td align="right">0.0741794</td>
+<td align="right">0.3798054</td>
+<td align="right">0.0129162</td>
+<td align="right">0.2561914</td>
+</tr>
+<tr class="odd">
+<td align="left">Gastrointestinal ulcers/bleeds</td>
+<td align="right">0.0676586</td>
+<td align="right">0.2851789</td>
+<td align="right">0.0344014</td>
+<td align="right">-0.0345914</td>
+</tr>
+<tr class="even">
+<td align="left">Tuberculosis</td>
+<td align="right">-0.0888312</td>
+<td align="right">0.1406311</td>
+<td align="right">0.0295588</td>
+<td align="right">0.1186715</td>
+</tr>
+<tr class="odd">
+<td align="left">Cataracts</td>
+<td align="right">-0.0586890</td>
+<td align="right">0.2279321</td>
+<td align="right">0.0592119</td>
+<td align="right">0.0256677</td>
+</tr>
+<tr class="even">
+<td align="left">Glaucoma</td>
+<td align="right">-0.0822952</td>
+<td align="right">0.0392207</td>
+<td align="right">0.0089597</td>
+<td align="right">-0.0418642</td>
+</tr>
+</tbody>
+</table>
+<p>In mapping these coefficients to person characteristics, in
+consultation with the sponsor, we makde the following simplified
+assumption: * We are asking one question about generally if the person
+has been taking low-dose or high-dose OCS. We then apply this response
+to both current and historical use. This is because remembering the
+nuances of OCS use over the years might be fraught with inaccuracy</p>
 </div>
-<div id="this-web-app-calculates-the-relative-risk." class="section level4">
-<h4>This web app calculates the Relative Risk.</h4>
-<p>A relative increase of 50% means that compared with someone who is
-not taking oral corticosteroids, the risk is increased by 50%. The
-absolute value of change in risk is dependent on the baseline risk. For
-example, a 50% relative risk increase for someone with 2% risk is 3%.
-(that is, an extra 1%). However, for someone with 10%, the risk will be
-15% (that is, an extra 5% of risk).</p>
-<p>Your baseline risk is affected by many factors, such as your age and
-gender. Please carefully discuss your baseline risk with consultation
-with your care provider.</p>
+<div id="calculating-rerlative-risk" class="section level3">
+<h3>Calculating rerlative risk</h3>
+<p>The equation for calculating RR is</p>
+<p><span class="math display"><em>R</em><em>R</em> = <em>e</em><em>x</em><em>p</em>(<em>β</em><sub>0</sub><em>X</em><sub>0</sub>+<em>β</em><sub>1</sub><em>X</em><sub>1</sub>+<em>β</em><sub>2</sub><em>X</em><sub>2</sub>+<em>β</em><sub>3</sub><em>X</em><sub>3</sub>)</span>
+where indices 0-3 refer to the four exposure variables as in the table
+above.</p>
 </div>
+<div id="baseline-risk" class="section level3">
+<h3>Baseline risk</h3>
+<p>Estimating the baseline risk of events for the patient is out of the
+scope of this web application. Instead, for specific outcomes, this web
+app let’s the user indicate their own baseline risk as if they have
+never taken OCS (typically after consultation with their care provider)
+and then evaluate the added risk given the specified OCS exposure
+profile.</p>
+<p>However, the slider for baseline risk is pre-populated with the
+10-year incidence of outcomes in the comparison group (those who did not
+take OCS) as reported by Sullivan et al. This is only a suggested
+default value. If the user profiel is significantly different from the
+baseline characteristics of the copmparison cohort in Sullivan et al’
+study, this risk estimate can be substantially biased.</p>
 </div>
 <div id="contact-us" class="section level3">
 <h3>Contact us</h3>
