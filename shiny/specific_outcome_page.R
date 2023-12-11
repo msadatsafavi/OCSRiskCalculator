@@ -15,7 +15,7 @@ create_specific_coutcome_content <- function(profile, outcome_name)
 
   preamble <- list(
     h4("You have selected the following outcome:", span(class="text-success", outcome_name)),
-    h4(style="border:1px;", ifelse(is.null(outcome_desc),"",outcome_desc)))
+    h5(style="border:1px;  font-style:italic", ifelse(is.null(outcome_desc),"",outcome_desc)))
 
   if(rr > 1)
   {

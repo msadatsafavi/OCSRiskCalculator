@@ -5,7 +5,7 @@ output:
     #theme: null
     #highlight: null
     mathjax: null
-date: "2023-12-09"
+date: "2023-12-11"
 knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = file.path(dirname(inputFile), '/www/Welcome.html')) })
 
 ---
@@ -18,22 +18,26 @@ library(OCSRiskCalculator)
 
 Welcome to this Web App! 
 
-This Web app helps individuals who are using, or having using oral corticosteroids, to calculate their risk of adverse outcomes.
+This Web app helps individuals who are using, or have used oral corticosteroids in the past to estimate their risk of some adverse health outcomes associated with such medications.
 
-All the calculations in this application are based on a 2018 study in the Journal of Allergy and Clinical Immunology, by Sullivan and colleagues  ([Click here to access the publication poge](http://dx.doi.org/10.1016/j.jaci.2017.04.009). 
-
+All the calculations in this application are based on a 2018 scientific study in the Journal of Allergy and Clinical Immunology ([Click here to access the publication poge](http://dx.doi.org/10.1016/j.jaci.2017.04.009). 
 
 ### Things to remember
 
-#### This web app must be used in consultation with your care provider
+* This web app must be used in consultation with your care provider
 
-#### This web app calculates the Relative Risk.
-A relative increase of 50% means that compared with someone who is not taking oral corticosteroids, the risk is increased by 50%. The absolute value of change in risk is dependent on the baseline risk. For example, a 50% relative risk increase for someone with 2% risk is 3%. (that is, an extra 1%). However, for someone with 10%, the risk will be 15% (that is, an extra 5% of risk).
+* This web app calculates the **Relative Risk**.
+  + A Relative Risk of 1.5 for someone who is using oral corticosteroids means a relative increase of 50% compared with someone who is not taking oral corticosteroids. 
+  + The absolute value of change in risk is dependent on the **baseline risk**. 
+  + For example, for someone with a baseline risk of 2% for an outcome, a 50% relative risk increase means the risk is increased to 3%  (that is, an extra 1%). 
+  + However, for someone with baseline risk of 10%, the same relative increase means their risk will become 15% that is, an extra 5% in risk).
 
-Your baseline risk is affected by many factors, such as your age and gender. Please carefully discuss your baseline risk with consultation with your care provider.
+* Your baseline risk is affected by many factors, such as your age and gender. The baseline risk for an outcome should generally be estimated in consultation with your care provider
 
 ### Contact us
-You can contact us at XXX.
+
+
+
 
 `Before using this app, please click on the checkbox below to indicate that you consent to use this tool and understand the risk of using the tool without proper consultation with an expert. 
 ```{=html}

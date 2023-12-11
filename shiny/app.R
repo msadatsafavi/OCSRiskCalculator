@@ -59,7 +59,7 @@ ui <- fluidPage(
 
   tabsetPanel(id="master_panel", type="hidden",
     tabPanel("welcome_panel",
-      tags$iframe(src=("Welcome.html"), style="width:100%; height:50vh"),
+      tags$iframe(src=("Welcome.html?hgf"), style="width:100%; height:75vh"),
       hr(),
       fluidRow(
         column(4,
@@ -104,8 +104,6 @@ ui <- fluidPage(
         )
 
         ,mainPanel(
-
-          textOutput("profile"),
           tabsetPanel(id="main_panel",
                       tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")),
                       tabPanel("Specific outcome",
@@ -162,8 +160,6 @@ server <- function(input, output, session)
       ocs_year=(time_range_map[input$ocs_years]),
       ocs_intensity=(as.integer(input$ocs_intensity)))
   })
-
-  output$profile <- renderText(pfl())
 
   observeEvent(input$make_app_visible,
    {
@@ -254,6 +250,10 @@ server <- function(input, output, session)
       output$specific_outcome_content <- renderUI(create_specific_coutcome_content(pfl(), input$specific_outcome_selector)) #Just in case the content might be different per outcome, we are 'creating things' on the fly
       updateCheckboxInput(inputId="know_my_bg_risk",value=F)
       #shinyjs::hide("div_know_my_bg_risk")
+    }
+    else
+    {
+      output$specific_outcome_content <- renderUI("")
     }
   })
 

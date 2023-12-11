@@ -66,5 +66,5 @@ create_bar_plot <- function(profile, outcomes)
     }
     writeLines(str, tf1)
 
-  str
+    paste("<p align='left' class='text-success'>You can click on each outcome to learn more about them individually</p>",str)
 }
