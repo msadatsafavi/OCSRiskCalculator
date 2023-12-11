@@ -39,7 +39,7 @@ create_specific_coutcome_content <- function(profile, outcome_name)
       hr(),
       h5("If, after consulting with your care provider, you know your risk of this outcome, you can calculate the absolute increase in your risk."),
       h5(checkboxInput("know_my_bg_risk","I know my background risk", value=T)),
-      div(id="div_know_my_bg_risk",
+      div(id="div_know_my_bg_risk", style="visibility:hidden",
         h5("In the study by Sullivan et al, the 10-year risk of this outcome in individuals who are not taking oral corticosteroids was approximately",
            span(class="text-success", round(bg_risk*100),"%")),
         div(

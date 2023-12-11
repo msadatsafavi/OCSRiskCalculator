@@ -10,7 +10,14 @@ library(bsicons)
 source("summary_page.R")
 source("specific_outcome_page.R")
 
+get_outcomes <- function()
+{
+  outcomes <- OCSRiskCalculator:::get_outcomes()
+  outcomes[-which(outcomes %in% c("avn","tbs"))]
+}
+
 theme_selector <- F
+
 
  custom_theme <- bs_theme(
    version = 5,
@@ -178,6 +185,14 @@ server <- function(input, output, session)
     if(input$know_my_bg_risk)
     {
       shinyjs::show("div_know_my_bg_risk", anim=T)
+      shinyjs::runjs("document.getElementById('div_know_my_bg_risk').style.visibility='visible'")
+
+      #UPdate the progress bars as sometimes (always?) the stacked progress bar does not show the right value initially?
+      outcome <- get_outcomes()[input$specific_outcome_selector]
+      risk_before <- input$specific_outcome_before/100
+      risk_after <- min(risk_before*calculate_risk(pfl(),outcome),1)
+      updateProgressBar(id="pb_specific_outcome_before",value=risk_before*100)
+      updateProgressBar(id="pb_specific_outcome_after",value=(risk_after-risk_before)*100)
     }
     else
     {
@@ -204,6 +219,9 @@ server <- function(input, output, session)
       shinyjs::enable("specific_outcome_selector")
       if(input$specific_outcome_selector!="PLEASE SELECT")
         output$specific_outcome_content <- renderUI(create_specific_coutcome_content(pfl(), input$specific_outcome_selector))
+
+      updateCheckboxInput(inputId='know_my_bg_risk', value=F)
+
     }
     else
     {
@@ -266,9 +284,9 @@ server <- function(input, output, session)
     updateProgressBar(id="pb_specific_outcome_before",value=risk_before*100)
     updateProgressBar(id="pb_specific_outcome_after",value=(risk_after-risk_before)*100)
 
-    yellow <- round(risk_before*100)
-    red <- round(risk_after*100) - yellow
-    green <- 100 - red - yellow
+    # yellow <- round(risk_before*100)
+    # red <- round(risk_after*100) - yellow
+    # green <- 100 - red - yellow
     # output$specific_outcome_icon_array <- renderUI(HTML(generate_icon_array(counts=c(yellow, red, green))))
     # output$specific_outcome_icon_array_legend <- renderUI(HTML(generate_icon_array_legend()))
   })
