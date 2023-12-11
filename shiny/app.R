@@ -46,59 +46,7 @@ start_here_innerHTML <- '<h1 style="color:tomato">← Start Here</h1>
 ui <- fluidPage(
   theme = custom_theme,
 
-  tags$style(
-
-  "
-  #summary_desc {
-    border-width:1px;
-    border-style:solid;
-    border-color:#959595;
-    font-size: 20px;
-  }
-
-  #summary_plot {
-    border-width:1px;
-    background-color: #ffffff;
-  }
-
-  #high_dose_desc {
-    border-width:1px;
-    border-style:solid;
-    border-color:#959595;
-    font-style: italic;
-  }
-
-  .container-fluid {
-    background-color: white;
-  }
-
-  .nav-tabs {
-    font-size: 20px;
-  }
-
-  body {
-    background-color: white;
-  }
-
-  #input_panel {
-    font-size: 20px;
-    background-color: #e0f3db;
-  }
-
-  #title_panel {
-    height: 80px;
-    text-align: center;
-    padding: 20px;
-    background-color: #404040;
-    color: white;
-  }
-
-  #footer {
-    text-align: center;
-  }
-
-
-  "),
+  tags$head(tags$link(rel = "stylesheet", type="text/css", href="style.css")),
 
   shinyjs::useShinyjs(),
 
