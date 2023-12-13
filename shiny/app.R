@@ -65,21 +65,19 @@ ui <- fluidPage(
 
   tabsetPanel(id="master_panel", type="hidden",
     tabPanel("welcome_panel",
-      tags$iframe(src=("Welcome.html?hgf"), style="width:100%; height:75vh"),
+      tags$iframe(src=("Welcome.html?hgf"), style="width:100%; height:70vh"),
       fluidRow(
-        column(4,
+        column(3),
+        column(3,
           checkboxInput("consent0","I understand the purpose of this tool", width="100%"),
           textOutput("need_to_consent0"),
-          tags$head(tags$style("#need_to_consent0{color: red;
-                                 font-size: 20px;
-                                 font-style: italic;
-                                 }"))
-        ),
-        column(4,
-          fluidRow(actionButton("make_app_visible","Go to the app!"))
-        ),
-        column(4)
-      )
+          tags$head(tags$style("#need_to_consent0{color:red;}"))
+          ),
+          column(3,
+            fluidRow(actionButton("make_app_visible","Take me to the app!"))
+          ),
+          column(3)
+        )
     ),
     tabPanel("app_panel",
       sidebarLayout(

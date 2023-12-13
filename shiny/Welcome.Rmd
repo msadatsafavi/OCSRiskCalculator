@@ -45,7 +45,7 @@ Should you want to contact the creators of this web application to provide feedb
                <p>For a detailed description of the tool, please refer to the About page on top</a>.</p>
 ```
 
-### BEfore you start
+### Before you start
 Before using this app, please click on the checkbox below to indicate that you consent to use this tool and understand the risk of using the tool without proper consultation with an expert. 
 
 
