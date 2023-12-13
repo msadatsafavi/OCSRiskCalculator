@@ -45,7 +45,6 @@ time_range_map <- c(
 )
 
 
-
 start_here_innerHTML <- '<h1 style="color:tomato">← Start Here</h1>
                         <p>Enter your data in the left panel and press “Calculate” after agreeing with the terms</p>'
 
@@ -53,7 +52,7 @@ start_here_innerHTML <- '<h1 style="color:tomato">← Start Here</h1>
 ui <- fluidPage(
   theme = custom_theme,
 
-  tags$head(tags$link(rel = "stylesheet", type="text/css", href="style.css")),
+  tags$head(tags$link(rel="stylesheet", type="text/css", href="style.css")),
 
   shinyjs::useShinyjs(),
 
@@ -67,7 +66,6 @@ ui <- fluidPage(
   tabsetPanel(id="master_panel", type="hidden",
     tabPanel("welcome_panel",
       tags$iframe(src=("Welcome.html?hgf"), style="width:100%; height:75vh"),
-      hr(),
       fluidRow(
         column(4,
           checkboxInput("consent0","I understand the purpose of this tool", width="100%"),
@@ -86,15 +84,14 @@ ui <- fluidPage(
     tabPanel("app_panel",
       sidebarLayout(
         sidebarPanel(id="input_panel",
-           radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
-          #,sliderInput("ocs_years", label="Number of years taking oral corticosteroids:", min=1, max=10, value=1, width="50%")
-          ,hr()
-          ,sliderTextInput(
+            sliderTextInput(
             inputId = "ocs_years",
             label = "Number of years taking oral corticosteroids:",
             choices = names(time_range_map),
             selected = names(time_range_map)[5]
           )
+          ,hr()
+          ,radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
           ,hr()
           ,radioButtons("ocs_intensity","Generally, your oral corticosteroids use has been:", choices=c("Low"=0, "High"=1))
           ,p(id="high_dose_desc", "Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
@@ -117,14 +114,14 @@ ui <- fluidPage(
                                h3(paste0("In this page, we evaluate the risk of specific outcomes")),
                                selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
                                uiOutput("specific_outcome_content")),
-                      tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:700px;')),
+                      tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:70vh;')),
                       ),
         )))),
   tags$script(src="app.js"),
   hr(),
   div(id="footer",
       div("By NAPTIA Consultation"),
-      div(print(paste("App version: 1 (2023.12.09)")))
+      div(print(paste("App version: 1 (2023.12.13)")))
       )
 )
 

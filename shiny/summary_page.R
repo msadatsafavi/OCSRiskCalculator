@@ -3,14 +3,17 @@
 generate_summary_text <- function()
 {
   HTML("
-  <DIV class='text-primary-emphasis'><P><B>About this bar chart</B></P>
-      The bar chart above demonstrates the <B>Risk Ratio</B>:
-       the ratio of risk of outcomes between someone with exposure to oral corticosteroids to the same person,
-       had they not taken any oral corticosteroids.
-       For example, a risk ratio of 50% for diabetes indicates that
-       a person with this history of oral corticosteroid use has 50% higher risk of developing diabetes compared with a person of similar age and sex
-       but without having used any oral corticosteroids.</DIV>
-       ")
+    <DIV class='text-primary-emphasis'><P><B>About this bar chart</B></P>
+       <P>The bar chart above demonstrates the <B>Risk Ratio</B></P>
+
+       <P><B>What is Risk Ratio?</B><BR/>
+       The ratio of risk of outcomes between someone with exposure to oral corticosteroids to the same person, had they not taken any oral corticosteroids.</P>
+
+      <P><B>Example:</B><BR/>
+      A risk ratio of 50% for Diabetes indicates that a person with a history of oral corticosteroid exposure has a 50% higher risk of developing diabetes compared with a similar person without having used any oral corticosteroids.</P>
+
+    </DIV>
+  ")
 }
 
 
@@ -44,11 +47,14 @@ create_bar_plot <- function(profile, outcomes)
 
 
   df <- data.frame(outcome=names(outcomes),rr=rrs,label=labels)
+  df2 <- df[order(df$rr,decreasing=F),]
+  df2$outcome <- factor(df2$outcome, levels=df2$outcome)
 
   require(ggplot2)
 
-  plt <- ggplot(data=df,aes(x=outcome, y=(rr-1)*100))+
+  plt <- ggplot(data=df2,aes(x=outcome, y=(rr-1)*100))+
     xlab("")+ylab("Percent Increase")+
+    #aes(x=reorder(label,rr,))+
     geom_bar(stat="identity", fill="#43a2ca")+
     geom_text(aes(label=label), hjust=-0.1, vjust=0.5, color="#636363", size=7, family="open sans")+
     theme(axis.text=element_text(size=20))+
@@ -66,5 +72,7 @@ create_bar_plot <- function(profile, outcomes)
     }
     writeLines(str, tf1)
 
-    paste("<p align='left' class='text-success'>You can click on each outcome to learn more about them individually</p>",str)
+    paste("<p align='left' class='text-success'>You can click on each outcome to learn more about them individually</p>
+            <p style='color:tomato'>The specific outcomes shown in the below graph are not a comprehensive list, rather comprise the more common outcomes associated with oral corticosteroid exposure"
+          ,str)
 }

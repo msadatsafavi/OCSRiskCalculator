@@ -1,8 +1,19 @@
 outcome_descs <-
 
   list(
-    ost="Osteoporosis is a systemic skeletal disorder characterized by low bone mass, micro-architectural deterioration of bone tissue leading to bone sterility, and consequent increase in fracture risk. It is the most common reason for a broken bone among the elderly"
-  )
+    ost="Osteoporosis is a systemic skeletal disorder characterized by low bone mass, micro-architectural deterioration of bone tissue leading to bone sterility, and consequent increase in fracture risk. It is the most common reason for a broken bone among the elderly.",
+    frc="A bone fracture is the medical definition for a broken bone. Bone fracture can affect anyone for various reasons such as traumas like falls, car accidents, sports injuries, co-morbid conditions (osteoporosis), or use of some medications.",
+    mbs="Metabolic syndrome is a serious health condition that puts individuals at higher risk of heart disease, diabetes, stroke and diseases related to fatty buildups in artery walls (atherosclerosis). Underlying causes of metabolic syndrome include overweight and obesity, insulin resistance, physical inactivity, genetic factors and increasing age.",
+    htn="High blood pressure, also known as hypertension, is when your blood pressure, the force of your blood pushing against the walls of your blood vessels, is consistently too high. Over time, consistently high blood pressure can ultimately lead to other conditions ranging from arrhythmia to heart attach and stroke.",
+    obs="Obesity is defined as a body mass index (BMI) of 30 kg/m² or higher. Obesity is now recognized as a major, independent risk factor for the development of heart disease and other metabolic conditions.",
+    dm2="Type 2 diabetes is a condition that happens because of a problem in the way the body regulates and uses sugar as fuel. This long-term condition results in too much sugar circulating in the blood, which may eventually lead to disorders of the circulatory, nervous, and immune systems.",
+    dlp="Dyslipidemia is the medical term for high cholesterol. With high cholesterol, you can develop fatty deposits in your blood vessels, which make it difficult for blood to flow through your arteries. High levels of cholesterol can increase your risk of heart disease or stroke.",
+    avn="",
+    gib="Gastrointestinal ulcers are open sores that develop on the inside lining of your stomach or upper portion of your small intestine. If left untreated, these ulcers may lead to complications such as internal bleeding in the stomach or small intestine.",
+    tbs="",
+    ctc="Cataracts are cloudy areas that form on the lens of your eye. You may feel as if you’re looking at the world through a dirty window, and over time, your vision gets worse. (Mayo clinic)",
+    glc="Glaucoma is a general term used to describe a group of eye disorders that damage your optic nerve. It’s the most common form of optic nerve damage leading to vision loss (Cleveland Clinic)"
+    )
 
 
 
@@ -35,22 +46,25 @@ create_specific_coutcome_content <- function(profile, outcome_name)
             theme(axis.title=element_text(size=20,face="bold"),  plot.background = element_rect(fill = "#ffffff"),
                   panel.background = element_rect(fill = "#ffffff", colour="#0e406a")),
              height=150)),
-
+      p("Interpretation: A risk ratio of 1.82 can be interpretated as a person with is using oral corticosteroid has a relative 82% increase in risk of developing (specific outcome) compared to someone who is not taking oral corticosteroids."),
       hr(),
       h5("If, after consulting with your care provider, you know your risk of this outcome, you can calculate the absolute increase in your risk."),
-      h5(checkboxInput("know_my_bg_risk","I know my background risk", value=T)),
+      h5(checkboxInput("know_my_bg_risk","I know my background risk*", value=T)),
       div(id="div_know_my_bg_risk", style="visibility:hidden",
-        h5("In the study by Sullivan et al, the 10-year risk of this outcome in individuals who are not taking oral corticosteroids was approximately",
-           span(class="text-success", round(bg_risk*100),"%")),
-        div(
-          span(style="float:left;", sliderInput("specific_outcome_before",label="Risk without using oral corticosteroids*",min=0,max=100, value=bg_risk*100)),
-          br(),br(),span(class="text-danger-emphasis", style="margin-top:100px", "  *Your background risk should be estimated after consulting with your care provider.")),
-        br(),
-        hr(),
-
-
-        #progressBar("specific_outcome_after", value = 0, title = "Risk with using oral corticosteroids", display_pct = TRUE, status = "danger", striped = TRUE),
-
+        h6("*Your background risk should be estimated after consulting your healthcare provider. Once determined, move the scale to the appropriate background risk % to obtain the absolute risk."),
+        tags$style(HTML(type="text/css", "#specific_outcome_before-label {font-weight:bold;}")),
+        fluidRow(
+          column(6,
+            sliderInput("specific_outcome_before",label="Select the estimated risk for a person like you who has never used oral corticosteroids:",min=0, max=100, value=bg_risk*100, width="100%")
+          ),
+          column(6,
+            p(style="font-style:italic; display:flex; align-items:flex-end; height:80%; font-size:75%;",
+              paste0("The starting value is set to the 10-year risk of this outcome in individuals not taking oral corticosteroids in the study by Sullivan et al ("
+                ,round(bg_risk*100),"%).")
+            )
+          )
+        ),
+        p(style="font-weight:bold", "How the risks changes with oral corticosteroids:"),
         HTML("<div class='progress' style='height:50px;'>
                 <div id='pb_specific_outcome_before' class='progress-bar progress-bar-striped' role='progressbar' style='width: 15%; aria-valuenow='15' aria-valuemin='0' aria-valuemax='100'>15</div>
                 <div id='pb_specific_outcome_after' class='progress-bar progress-bar-striped progress-bar-animated bg-dark' role='progressbar' style='width: 30%' aria-valuenow='30' aria-valuemin='0' aria-valuemax='100'>30</div>
@@ -63,7 +77,7 @@ create_specific_coutcome_content <- function(profile, outcome_name)
                 <div class='progress-bar progress-bar-striped progress-bar-animated bg-dark' role='progressbar' style='width: 100%; aria-valuenow='100' aria-valuemin='0' aria-valuemax='100'>Added risk with oral corticosteroids</div>
               </div>
              "),
-        hr()
+        # hr()
         #,
         # div(style="border:solid; color:gray; float:left; width:100%;",
         #   span(style='float:left; width:250px;', uiOutput("specific_outcome_icon_array", inline=T)),

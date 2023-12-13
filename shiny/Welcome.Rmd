@@ -16,34 +16,36 @@ knitr::opts_chunk$set(echo = TRUE)
 library(OCSRiskCalculator)
 ```
 
-Welcome to this Web App! 
+### **Welcome to this Web Application! Please review the below instructions prior to entering the application**
 
-This Web app helps individuals who are using, or have used oral corticosteroids in the past to estimate their risk of some adverse health outcomes associated with such medications.
+This Web app may aid individuals who are using or have previously used oral corticosteroids to estimate their risk of various adverse health outcomes associated with oral corticosteroid use.
 
-All the calculations in this application are based on a 2018 scientific study in the Journal of Allergy and Clinical Immunology ([Click here to access the publication poge](http://dx.doi.org/10.1016/j.jaci.2017.04.009). 
+All the calculations in this application are based on a 2018 scientific study in the Journal of Allergy and Clinical Immunology [(Click here to access the publication page)](http://dx.doi.org/10.1016/j.jaci.2017.04.009). 
 
-### Things to remember
+### Things to remember when using this Web Application: 
 
-* This web app must be used in consultation with your care provider
+* **This web app must be used in consultation with your care provider**
 
 * This web app calculates the **Relative Risk**.
-  + A Relative Risk of 1.5 for someone who is using oral corticosteroids means a relative increase of 50% compared with someone who is not taking oral corticosteroids. 
-  + The absolute value of change in risk is dependent on the **baseline risk**. 
+  + A relative risk of 1.5 for someone who is using oral   corticosteroids means a relative increase in risk of 50% compared with someone who is not taking oral corticosteroids. 
   + For example, for someone with a baseline risk of 2% for an outcome, a 50% relative risk increase means the risk is increased to 3%  (that is, an extra 1%). 
   + However, for someone with baseline risk of 10%, the same relative increase means their risk will become 15% that is, an extra 5% in risk).
 
-* Your baseline risk is affected by many factors, such as your age and gender. The baseline risk for an outcome should generally be estimated in consultation with your care provider
+* Your **baseline risk** is affected by many factors, such as your age and gender. The baseline risk for an outcome should generally be estimated in consultation with your healthcare provider and should not be derived from this web application.
+  + The absolute value of change in risk is dependent on the **baseline risk**. 
+  
 
 ### Contact us
+Should you want to contact the creators of this web application to provide feedback, please reach out to info@naptia.com
 
 
-
-
-`Before using this app, please click on the checkbox below to indicate that you consent to use this tool and understand the risk of using the tool without proper consultation with an expert. 
 ```{=html}
-<p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. None of the variables on the left panel have a causal interpretation in the model. Changing them for a single patient to estimate the effect of an intervention would be misleading and should be avoided.  </span>
+<p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. </span>
                <br></p>
                <p>For a detailed description of the tool, please refer to the About page on top</a>.</p>
 ```
+
+### BEfore you start
+Before using this app, please click on the checkbox below to indicate that you consent to use this tool and understand the risk of using the tool without proper consultation with an expert. 
 
 

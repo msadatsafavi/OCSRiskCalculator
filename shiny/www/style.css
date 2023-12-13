@@ -21,7 +21,6 @@ src: url('mexcellent.ttf') format('truetype'),
     border-width:1px;
     border-style:solid;
     border-color:#959595;
-    font-style: italic;
   }
 
   .container-fluid {
