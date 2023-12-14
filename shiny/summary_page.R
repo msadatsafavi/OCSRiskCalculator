@@ -3,7 +3,7 @@
 generate_summary_text <- function()
 {
   HTML("
-    <DIV class='text-primary-emphasis'><P><B>About this bar chart</B></P>
+    <DIV><P><B>About this bar chart</B></P>
        <P>The bar chart above demonstrates the <B>Risk Ratio</B></P>
 
        <P><B>What is Risk Ratio?</B><BR/>
@@ -73,7 +73,7 @@ create_bar_plot <- function(profile, outcomes)
     writeLines(str, tf1)
 
     paste("
-          <p><span style='color:tomato'>The specific outcomes shown in the below graph are not a comprehensive list, rather comprise the more common outcomes associated with oral corticosteroid exposure.</span>
+          <p>The specific outcomes shown in the below graph are not a comprehensive list, rather comprise the more common outcomes associated with oral corticosteroid exposure.
           <span style='font-weight:bold; color:black'>You can click on each outcome to learn more about them individually</span></p>"
           ,str)
 }

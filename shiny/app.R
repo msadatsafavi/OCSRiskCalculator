@@ -82,19 +82,16 @@ ui <- fluidPage(
     tabPanel("app_panel",
       sidebarLayout(
         sidebarPanel(id="input_panel",
-            sliderTextInput(
+          sliderTextInput(
             inputId = "ocs_years",
-            label = "number of years taking oral corticosteroids (past or present use):",
+            label = "Number of years taking oral corticosteroids (past or present use):",
             choices = names(time_range_map),
             selected = names(time_range_map)[5]
           )
-          ,hr()
           ,radioButtons("cur_ocs","Are you currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
-          ,hr()
-          ,radioButtons("ocs_intensity","Generally, your oral corticosteroids use has been:", choices=c("Low"=0, "High"=1))
-          ,p(id="high_dose_desc", "Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
-          ,hr()
-          ,div("This tool should be discussed with a provider")
+          ,radioButtons("ocs_intensity","Generally, your oral corticosteroids use has been:*", choices=c("Low"=0, "High"=1))
+          ,p(id="high_dose_desc", style="color:gray", "*Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
+          ,div("This tool should be used in discussion with your care provider")
           ,actionButton("calculate","Calculate!")
           ,actionButton("reset","Restart")
           ,textOutput("need_to_consent")
@@ -109,7 +106,7 @@ ui <- fluidPage(
           tabsetPanel(id="main_panel",
                       tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")),
                       tabPanel("Specific outcome",
-                               h3(paste0("In this page, we evaluate the risk of specific outcomes")),
+                               h5(paste0("In this page, we evaluate the risk of specific outcomes")),
                                selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
                                uiOutput("specific_outcome_content")),
                       tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:70vh;')),
