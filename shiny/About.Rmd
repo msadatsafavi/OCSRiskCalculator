@@ -20,7 +20,7 @@ outcomes <- get_outcomes()
 
 The purpose of this project is to create a Web App for quantifying the relative risk of long-term oral corticosteroid (OCS) use in patients with asthma.
 
-Based on a careful review of the literature, we have selected the paper by [Sullivan et al, ](http://dx.doi.org/10.1016/j.jaci.2017.04.009). This is a rigorous retrospective cohort study with a large sample size from the US.
+Based on a careful review of the literature, we have selected the paper by [Sullivan et al, ](http://dx.doi.org/10.1016/j.jaci.2017.04.009){target="_blank"}. This is a rigorous retrospective cohort study with a large sample size from the US.
 
 
 ### Regression coefficients:
@@ -63,4 +63,4 @@ However, the slider for baseline risk is pre-populated with the 10-year incidenc
 
 
 ### Contact us
-
+Should you want to contact the creators of this web application to provide feedback, please reach out to info@naptia.com
