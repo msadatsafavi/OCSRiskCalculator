@@ -57,11 +57,11 @@ ui <- fluidPage(
   shinyjs::useShinyjs(),
 
   tags$head(
-    HTML("<title>Oral corticosteroid risk calculator</title>"),
+    HTML("<title>Oral corticosteroid risk calculator for patients with asthma</title>"),
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
 
-  titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator")),
+  titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator for patients with asthma")),
 
   tabsetPanel(id="master_panel", type="hidden",
     tabPanel("welcome_panel",

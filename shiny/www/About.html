@@ -10,9 +10,8 @@
 
 
 
-<meta name="date" content="2023-08-16" />
 
-<title>About this web app</title>
+<title>About.knit</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,22 +349,23 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">About this web app</h1>
-<h4 class="date">2023-08-16</h4>
 
 </div>
 
 
-<p>The purpose of this project is to create a Web App for quantifying
-the relative risk of long-term oral corticosteroid (OCS) use in patients
-with asthma.</p>
-<p>Based on a careful review of the literature, we have selected the
-paper by <a href="http://dx.doi.org/10.1016/j.jaci.2017.04.009" target="_blank">Sullivan et al,</a>. This is a rigorous retrospective
-cohort study with a large sample size from the US.</p>
+<p>This Web Application is a relative risk calculator for long-term risk
+of oral corticosteroid (OCS) use in patients with asthma.</p>
+<p>The calculations are based on a single peer-reviewed publication by
+<a href="http://dx.doi.org/10.1016/j.jaci.2017.04.009" target="_blank">Sullivan et al,</a>. This is a rigorous retrospective
+cohort study with a large sample size from the US. The calculations do
+not represent the entire body of evidence. We focused on a single
+high-quality work that could produce risk calculation according to the
+dose and history of OCS use.</p>
 <div id="regression-coefficients" class="section level3">
 <h3>Regression coefficients:</h3>
-<p>Table below presents the log-RR associated with each outcome. The
-interpretation of coefficients are as follows:</p>
+<p>Table below presents the logarithm of relative risks (log-RR)
+associated with each outcome.</p>
+<p>The interpretation of coefficients are as follows:</p>
 <ul>
 <li>Reference: not currently taking OCS, and not having any history of
 OCS use</li>
@@ -480,12 +480,11 @@ taking high-dose OCS</li>
 </tr>
 </tbody>
 </table>
-<p>In mapping these coefficients to person characteristics, in
-consultation with the sponsor, we makde the following simplified
-assumption: * We are asking one question about generally if the person
-has been taking low-dose or high-dose OCS. We then apply this response
-to both current and historical use. This is because remembering the
-nuances of OCS use over the years might be fraught with inaccuracy</p>
+<p>In mapping these coefficients to person characteristics, the
+following simplified assumption was made: one question is asked about
+whether the person has been taking low-dose or high-dose OCS, which is
+applied both to current and past use. This is because remembering the
+nuances of OCS use over the years might be fraught with inaccuracy.</p>
 </div>
 <div id="calculating-rerlative-risk" class="section level3">
 <h3>Calculating rerlative risk</h3>
@@ -499,20 +498,20 @@ above.</p>
 <p>Estimating the baseline risk of events for the patient is out of the
 scope of this web application. Instead, for specific outcomes, this web
 app let’s the user indicate their own baseline risk as if they have
-never taken OCS (typically after consultation with their care provider)
-and then evaluate the added risk given the specified OCS exposure
-profile.</p>
-<p>However, the slider for baseline risk is pre-populated with the
-10-year incidence of outcomes in the comparison group (those who did not
-take OCS) as reported by Sullivan et al. This is only a suggested
-default value. If the user profiel is significantly different from the
-baseline characteristics of the copmparison cohort in Sullivan et al’
-study, this risk estimate can be substantially biased.</p>
+never taken OCS (this is to be done after consultation with their care
+provider). The absolute risk increase is then applied given the relative
+risk.</p>
+<p>The slider for baseline risk is pre-populated with the 10-year
+incidence of outcomes in the comparison group (those who did not take
+OCS) in the study by Sullivan et al. This is only a suggested default
+value. If the user profile is significantly different from a typical
+patient in the comparison cohort of Sullivan et al’ study, this risk
+estimate can be substantially biased.</p>
 </div>
 <div id="contact-us" class="section level3">
 <h3>Contact us</h3>
 <p>Should you want to contact the creators of this web application to
-provide feedback, please reach out to <a href="mailto:info@naptia.com" class="email">info@naptia.com</a></p>
+provide feedback, please reach out to <a href="mailto:info@naptia.com" class="email">info@naptia.com</a>.</p>
 </div>
 
 

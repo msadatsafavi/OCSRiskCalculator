@@ -16,7 +16,7 @@ library(OCSRiskCalculator)
 
 ### **Welcome to this Web Application! Please review the below instructions prior to entering the application**
 
-This Web app may aid individuals who are using or have previously used oral corticosteroids to estimate their risk of various adverse health outcomes associated with oral corticosteroid use.
+This Web app may aid individuals with asthma who are using or have previously used oral corticosteroids to estimate their risk of various adverse health outcomes associated with oral corticosteroid use.
 
 All the calculations in this application are based on a 2018 scientific study in the Journal of Allergy and Clinical Immunology [(Click here to access the publication page)](http://dx.doi.org/10.1016/j.jaci.2017.04.009){target="_blank"}. 
 

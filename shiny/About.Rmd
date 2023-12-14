@@ -1,11 +1,9 @@
 ---
-title: "About this web app"
 output: 
   html_document: 
     #theme: null
     #highlight: null
     mathjax: null
-date: "2023-08-16"
 knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = file.path(dirname(inputFile), '/www/About.html')) })
 
 ---
@@ -14,17 +12,18 @@ knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = e
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
 library(OCSRiskCalculator)
-evidence <- get_evidence()
 outcomes <- get_outcomes()
+evidence <- get_evidence()
 ```
 
-The purpose of this project is to create a Web App for quantifying the relative risk of long-term oral corticosteroid (OCS) use in patients with asthma.
+This Web Application is a relative risk calculator for long-term risk of oral corticosteroid (OCS) use in patients with asthma.
 
-Based on a careful review of the literature, we have selected the paper by [Sullivan et al, ](http://dx.doi.org/10.1016/j.jaci.2017.04.009){target="_blank"}. This is a rigorous retrospective cohort study with a large sample size from the US.
+The calculations are based on a single peer-reviewed publication by [Sullivan et al, ](http://dx.doi.org/10.1016/j.jaci.2017.04.009){target="_blank"}. This is a rigorous retrospective cohort study with a large sample size from the US. The calculations do not represent the entire body of evidence. We focused on a single high-quality work that could produce risk calculation according to the dose and history of OCS use.
 
 
 ### Regression coefficients:
-Table below presents the log-RR associated with each outcome. 
+Table below presents the logarithm of relative risks (log-RR) associated with each outcome. 
+
 The interpretation of coefficients are as follows:
 
 * Reference: not currently taking OCS, and not having any history of OCS use
@@ -42,9 +41,7 @@ rownames(df) <- names(outcomes)
 kable(df)
 ```
 
-In mapping these coefficients to person characteristics, in consultation with the sponsor, we makde the following simplified assumption: 
-* We are asking one question about generally if the person has been taking low-dose or high-dose OCS. We then apply this response to both current and historical use. This is because remembering the nuances of OCS use over the years might be fraught with inaccuracy
-
+In mapping these coefficients to person characteristics, the following simplified assumption was made: one question is asked about whether the person has been taking low-dose or high-dose OCS, which is applied both to current and past use. This is because remembering the nuances of OCS use over the years might be fraught with inaccuracy.
 
 
 ### Calculating rerlative risk
@@ -57,10 +54,10 @@ where indices 0-3 refer to the four exposure variables as in the table above.
 
 
 ### Baseline risk
-Estimating the baseline risk of events for the patient is out of the scope of this web application. Instead, for specific outcomes, this web app let's the user indicate their own baseline risk as if they have never taken OCS (typically after consultation with their care provider) and then evaluate the added risk given the specified OCS exposure profile.
+Estimating the baseline risk of events for the patient is out of the scope of this web application. Instead, for specific outcomes, this web app let's the user indicate their own baseline risk as if they have never taken OCS (this is to be done after consultation with their care provider). The absolute risk increase is then applied given the relative risk.
 
-However, the slider for baseline risk is pre-populated with the 10-year incidence of outcomes in the comparison group (those who did not take OCS) as reported by Sullivan et al. This is only a suggested default value. If the user profiel is significantly different from the baseline characteristics of the copmparison cohort in Sullivan et al' study, this risk estimate can be substantially biased.
+The slider for baseline risk is pre-populated with the 10-year incidence of outcomes in the comparison group (those who did not take OCS) in the study  by Sullivan et al. This is only a suggested default value. If the user profile is significantly different from a typical patient in the comparison cohort of Sullivan et al' study, this risk estimate can be substantially biased.
 
 
 ### Contact us
-Should you want to contact the creators of this web application to provide feedback, please reach out to info@naptia.com
+Should you want to contact the creators of this web application to provide feedback, please reach out to info@naptia.com. 
