@@ -1,18 +1,67 @@
+#summary_desc {
+    border-width:1px;
+    border-style:solid;
+    border-color:#959595;
+    font-size: 20px;
+  }
+
+#summary_plot {
+    border-width:1px;
+    background-color: #ffffff;
+  }
+
+#high_dose_desc {
+  }
+
+  .container-fluid {
+    background-color: white;
+  }
+
+  .nav-tabs {
+    font-size: 20px;
+  }
+
+  body {
+    background-color: white;
+  }
+
+  #input_panel {
+    font-size: 20px;
+    background-color: #e0f3db;
+  }
+
+  #title_panel {
+    height: 80px;
+    text-align: center;
+    padding: 20px;
+    background-color: #404040;
+    color: white;
+  }
+
+  #footer {
+    text-align: center;
+  }
+
+
+
 #container {
-width: 100px;
-height: 100px;
-position: relative;
+  width: 100px;
+  height: 100px;
+  position: relative;
 }
+
 
 #navi,
 #infoi {
-width: 100%;
-height: 100%;
-position: absolute;
-top: 0;
-left: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #infoi {
-z-index: 10;
+  z-index: 10;
 }
+
+

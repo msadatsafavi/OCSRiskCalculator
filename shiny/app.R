@@ -1,189 +1,299 @@
 library(shiny)
+library(shinyWidgets)
 library(OCSRiskCalculator)
+library(svglite)
+library(stringr)
+library(markdown)
+library(bslib)
+library(bsicons)
 
-faces <- c(red='<svg class="red-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.red-face .cls-1{fill:#a53a47;}.red-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><path class="cls-2" d="M8.3,6a2,2,0,1,1-2-2A2,2,0,0,1,8.3,6Z"></path><circle class="cls-2" cx="14.7" cy="5.98" r="1.97"></circle><path class="cls-2" d="M16.61,15.38a6.29,6.29,0,0,0-12.18,0,.33.33,0,0,0,.24.41.34.34,0,0,0,.42-.24,5.6,5.6,0,0,1,10.86,0,.36.36,0,0,0,.15.21.39.39,0,0,0,.18,0h.08A.34.34,0,0,0,16.61,15.38Z"></path></g></g></svg>',
-          green='<svg class="green-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.green-face .cls-1{fill:#2eb49a;}.green-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><circle class="cls-2" cx="6.64" cy="6.95" r="1.83"></circle><circle class="cls-2" cx="14.42" cy="6.95" r="1.83"></circle><path class="cls-2" d="M16.67,11.29a.36.36,0,0,0-.27,0,.41.41,0,0,0-.17.22,5.89,5.89,0,0,1-11.41,0,.36.36,0,0,0-.16-.22.36.36,0,0,0-.27,0,.37.37,0,0,0-.22.17.36.36,0,0,0,0,.27,6.61,6.61,0,0,0,12.8,0A.37.37,0,0,0,16.67,11.29Z"></path></g></g></svg>',
-          yellow='<svg class="yellow-face" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.35 21.35"><defs><style>.yellow-face .cls-1{fill:#eea342;}.yellow-face .cls-2{fill:#fff;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><circle class="cls-1" cx="10.67" cy="10.67" r="10.67"></circle><circle class="cls-2" cx="6.67" cy="7.92" r="1.81"></circle><circle class="cls-2" cx="14.36" cy="7.92" r="1.81"></circle><path class="cls-2" d="M17.12,14.29A11.46,11.46,0,0,1,4,14.3a.45.45,0,1,0-.53.73,12.42,12.42,0,0,0,7.17,2.23,11.66,11.66,0,0,0,7-2.25.45.45,0,0,0,.09-.63A.46.46,0,0,0,17.12,14.29Z"></path></g></g></svg>')
+source("summary_page.R")
+source("specific_outcome_page.R")
 
+get_outcomes <- function()
+{
+  outcomes <- OCSRiskCalculator:::get_outcomes()
+  outcomes[-which(outcomes %in% c("avn","tbs"))]
+}
 
-info_div_innerHTML <- "<TABLE style='background-color:gray;width:100%;height:100%'>
-                        <TBODY>
-                          <TR>
-                            <TD></TD>
-                            <TD align='center'>
-                              <SPAN style='border:5px red solid; background-color:orange;'>
-                                More Info
-                              </SPAN>
-                            </TD>
-                            <TD></TD>
-                          </TR>
-                        </TBODY>
-                      </TABLE>"
-
-start_here_innerHTML <- '<h1>← Start Here</h1>
-                        <p>Enter patient data in the left panel and press “Run the prediction model.”</p>
-                        <p>Inputs marked with <span style="color:red">*</span> are required.</p>
-                        <p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. None of the predictors on the left panel have a causal interpretation in the model. Changing them for a single patient to estimate the effect of an intervention would be misleading and should be avoided.  </span>
-                        <br></p>
-                        <p>For a detailed description of the model, please refer to the <a href="https://doi.org/10.1016/S2213-2600%2819%2930397-2">publication</a>.</p>
-                        <p>ACCEPT is also available as an Excel spreadsheet, R package, and API. Please refer to project <a href="http://resp.core.ubc.ca/research/Specific_Projects/accept">homepage</a> for more information.</p>'
+theme_selector <- F
 
 
-shinyApp(
-  ui = fluidPage(
-    shinyjs::useShinyjs(),
-    tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
-    ),
-    print(paste("Server version: 0.1")),
-    titlePanel("OCS risk calculator"),
-    sidebarLayout(
-      sidebarPanel(
-         numericInput("age", label="age", min=18, max=80, value=40, width="50%")
-        ,radioButtons("female","Gender:", choices=c("Female"=1, "Male"=0))
-        ,radioButtons("cur_ocs","Currently taking OCS:", choices=c("No"=0, "Yes"=1))
-        ,numericInput("ocs_years", label="Number of years taking corticosteroids", min=1, max=30, value=10, width="50%")
-        ,radioButtons("hist_ocs","Generally, your OCS dose has been", choices=c("Low"=0, "High"=1))
-        ,checkboxInput("consent","I understand the risks of using this tool")
-        ,actionButton("calculate","Calculate!")
-        ,actionButton("reset","Restart")
-        ,textOutput("need_to_consent")
-        ,tags$head(tags$style("#need_to_consent{color: red;
-                                 font-style: bold;
-                                 }"
-          )
-        )
-      )
-      ,mainPanel(
-        textOutput("profile"),
-        uiOutput("main"),
-      )),
-    tags$script(src="app.js")
+ custom_theme <- bs_theme(
+   version = 5,
+#   bg = "#e0f3db",
+#   fg = "#000000",
+#   primary = "#0199F8",
+#   secondary = "#FF374B",
+#   base_font = "Calibri"
+)
+
+custom_theme <- bs_theme_update(custom_theme, preset = "shiny")
+
+time_range_map <- c(
+  "<1 year"=0,
+  "1-2 years"=1.5,
+  "2-3 years"=2.5,
+  "3-4 years"=3.5,
+  "4-5 years"=4.5,
+  "5-6 years"=5.5,
+  "6-7 years"=6.5,
+  "7-8 years"=7.5,
+  "8-9 years"=8.5,
+  "9-10 years"=9.5,
+  "10 years or more"=10.5
+)
+
+
+start_here_innerHTML <- '<h1 style="color:tomato">← Start Here</h1>
+                        <p>Enter your data in the left panel and press “Calculate” after agreeing with the terms</p>'
+
+
+ui <- fluidPage(
+  theme = custom_theme,
+
+  tags$head(tags$link(rel="stylesheet", type="text/css", href="style.css")),
+
+  shinyjs::useShinyjs(),
+
+  tags$head(
+    HTML("<title>Oral corticosteroid risk calculator</title>"),
+    tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
 
+  titlePanel(h1(id="title_panel", "Oral corticosteroid risk calculator")),
 
-  server = function(input, output, session)
-  {
-    generate_icon_array <- function(order=c('yellow','red','green'),counts=c(50,30,20))
-    {
-      x <- c(rep(faces[order[1]],counts[1]),
-             rep(faces[order[2]],counts[2]),
-             rep(faces[order[3]],counts[3]))
-      out <- "<TABLE style='width:100%;margin:0;padding:0'><TBODY>"
-      for(i in 1:10)
-      {
-        out <- paste(out,"<TR>")
-        for(j in 1:10)
-        {
-          out <- paste(out,"<TD style='width:10%;height=10%'>",x[10*(i-1)+j],"</TD>")
-        }
-        out <- paste(out,"</TR>")
-      }
-      out <- paste(out,"</TBODY></TABLE>")
+  tabsetPanel(id="master_panel", type="hidden",
+    tabPanel("welcome_panel",
+      tags$iframe(src=("Welcome.html?hgf"), style="width:100%; height:70vh"),
+      fluidRow(
+        column(3),
+        column(3,
+          span(style="font-weight:bold;", checkboxInput("consent0","I understand the purpose of this tool", width="100%"))
+          ),
+          column(3,
+            fluidRow(actionButton("make_app_visible","Take me to the app!"))
+          ),
+          column(3,
+                 textOutput("need_to_consent0"),
+                 tags$head(tags$style("#need_to_consent0{color:red;}")))
+        )
+    ),
+    tabPanel("app_panel",
+      sidebarLayout(
+        sidebarPanel(id="input_panel",
+          sliderTextInput(
+            inputId = "ocs_years",
+            label = "Number of years taking oral corticosteroids (past or present use):",
+            choices = names(time_range_map),
+            selected = names(time_range_map)[5]
+          )
+          ,radioButtons("cur_ocs","Are you currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
+          ,radioButtons("ocs_intensity","Generally, your oral corticosteroids use has been:*", choices=c("Low"=0, "High"=1))
+          ,p(id="high_dose_desc", style="color:gray", "*Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
+          ,div("This tool should be used in discussion with your care provider")
+          ,actionButton("calculate","Calculate!")
+          ,actionButton("reset","Restart")
+          ,textOutput("need_to_consent")
+          ,tags$head(tags$style("#need_to_consent{color: red;
+                                   font-style: bold;
+                                   }"
+            )
+          )
+        )
 
-      out
-    }
-
-
-    observeEvent(input$calculate, {
-      if(isolate(input$consent))
-      {
-        for(i in 1:length(outcomes))
-        {
-          local({
-            my_i <- i
-            output[[paste0("summary_",outcomes[my_i])]] <- renderUI(HTML(create_summary_panel(profile=pfl(), outcome=outcomes[my_i])))
-          })
-        }
-        for(nm in names(input))
-          shinyjs::disable(nm)
-        shinyjs::enable("reset")
-        output$need_to_consent <- renderText("")
-        output$start_here <- renderUI(HTML(""))
-      }
-      else
-      {
-        output$need_to_consent <- renderText("Please consent to use this tool")
-      }
-    })
-
-    observeEvent(input$reset, {
-      for(i in 1:length(outcomes))
-      {
-        output[[paste0("summary_",outcomes[i])]] <- renderUI(HTML(""))
-      }
-      output$start_here <- renderUI(HTML(start_here_innerHTML))
-
-      updateCheckboxInput(inputId="consent",value = F)
-      for(nm in names(input))
-        shinyjs::enable(nm)
-      output$need_to_consent <- renderText("")
-    })
-
-    create_summary_panel <- function(profile, outcome)
-    {
-      #input$calculate
-      tmp <- round(calculate_risk(profile,outcome)*1000)/10
-      tmp_i <- round(tmp)
-      paste0("<DIV id='",outcome,"' onmouseover='mouseOverOutcome(this.id)' onmouseout='mouseExitOutcome(this.id)'>
-                <A href='http://www.sony.com'>
-                  <TABLE style='float:left;border:1px black solid;width:250pt;margin-top: 20px;  margin-bottom: 20px;  margin-right: 20px;  margin-left: 20px;'>
-                    <TBODY>
-                      <TR>
-                        <TD>",names(outcomes)[which(outcomes==outcome)],":",tmp[1],"% (from:", tmp[2],"% to:", tmp[3],"%)
-                        </TD>
-                      </TR>
-                      <TR>
-                        <TD>
-                          <DIV style='position:relative;z-index:1'>",
-                            generate_icon_array(counts=c(tmp_i[2],tmp_i[1],100-tmp_i[2]-tmp_i[1])),"
-                            <DIV id='more_info_",outcome,"' style='position:absolute;width:100%;height:100%;top:0;left:0;z-index:10;opacity:0.5;visibility:hidden'>",info_div_innerHTML,"
-                            </DIV>
-                          </DIV>
-                        </TD>
-                      </TR>
-                    </TBODY>
-                  </TABLE>
-                </A>
-             </DIV>")
-    }
-
-    outcomes <- get_outcomes()
-
-    panels <- list(tabPanel("Summary", uiOutput("summary")))
-    for(i in 1:length(outcomes))
-    {
-      panels[[i+1]] <- tabPanel(names(outcomes)[i])
-    }
-    output$main <- renderUI(do.call(tabsetPanel,args=panels))
-
-    output$summary <- renderUI({
-      panel_output_list <- list(htmlOutput("start_here", inline = T))
-      for(i in 1:length(outcomes))
-      {
-        panel_output_list[[i+1]] <- htmlOutput(paste0("summary_", outcomes[i]), inline=T, fill=F)
-      }
-
-      panel_output_list
-    })
-
-    output$start_here <- renderUI(HTML(start_here_innerHTML))
-
-    pfl <- reactive({
-                 c(female=as.integer(input$female),
-                 age= as.integer(input$age),
-                 cur_ocs=as.integer(input$cur_ocs),
-                 hist_ocs_low_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==0)),
-                 hist_ocs_high_years=(as.integer(input$ocs_years)*(as.integer(input$hist_ocs)==1)))
-              })
-
-    output$profile <- renderText(pfl())
-
-
-    #output$icon_array <- renderText(HTML(generate_icon_array()))
-  }
+        ,mainPanel(
+          tabsetPanel(id="main_panel",
+                      tabPanel("Summary", htmlOutput("start_here"),  uiOutput("summary_plot", inline=F, width="500px"), uiOutput("summary_desc")),
+                      tabPanel("Specific outcome",
+                               h5(paste0("In this page, we evaluate the risk of specific outcomes")),
+                               selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
+                               uiOutput("specific_outcome_content")),
+                      tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:70vh;')),
+                      tabPanel("Terms", div(style="white-space: pre-wrap;width:100%; height:100%;",
+                                            OCSRiskCalculator::terms_of_use()
+                                        )
+                              )
+                      )
+        )))),
+  tags$script(src="app.js"),
+  hr(),
+  div(id="footer",
+    div("By NAPTIA Consultation - App version: 1 (2023.12.13)")
+  )
 )
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+server <- function(input, output, session)
+{
+  outcomes <- get_outcomes()
+
+  shinyjs::disable("specific_outcome_selector") #when first started this should be disabled
+
+  # observeEvent(once = TRUE,ignoreNULL = FALSE, ignoreInit = FALSE, eventExpr = c(), {
+  #   showModal(modalDialog(
+  #     title = "Welcome!",
+  #     h1("Salam")
+  #   ))
+  # })
+
+
+
+  output$start_here <- renderUI(HTML(start_here_innerHTML))
+
+  pfl <- reactive({
+    c(female=as.integer(input$female),
+      age= as.integer(input$age),
+      cur_ocs=as.integer(input$cur_ocs),
+      ocs_year=(time_range_map[input$ocs_years]),
+      ocs_intensity=(as.integer(input$ocs_intensity)))
+  })
+
+  observeEvent(input$make_app_visible,
+   {
+     if(isolate(input$consent0))
+     {
+       updateTabsetPanel(session, inputId="master_panel", selected="app_panel")
+     }
+     else
+     {
+       output$need_to_consent0 <- renderText("Please consent to use this tool")
+     }
+
+   })
+
+  observeEvent(input$know_my_bg_risk, {
+    if(input$know_my_bg_risk)
+    {
+      shinyjs::show("div_know_my_bg_risk", anim=T)
+      shinyjs::runjs("document.getElementById('div_know_my_bg_risk').style.visibility='visible'")
+
+      #UPdate the progress bars as sometimes (always?) the stacked progress bar does not show the right value initially?
+      outcome <- get_outcomes()[input$specific_outcome_selector]
+      risk_before <- input$specific_outcome_before/100
+      risk_after <- min(risk_before*calculate_risk(pfl(),outcome),1)
+      updateProgressBar(id="pb_specific_outcome_before",value=risk_before*100)
+      updateProgressBar(id="pb_specific_outcome_after",value=(risk_after-risk_before)*100)
+    }
+    else
+    {
+      shinyjs::hide("div_know_my_bg_risk", anim=F)
+    }
+
+
+    })
+
+  observeEvent(input$calculate, {
+    #if(isolate(input$consent))
+    if(T)
+    {
+      plt <- create_bar_plot(profile=pfl(), outcomes=outcomes)
+      output$summary_plot <- renderUI(HTML(plt))
+      output$summary_desc <- renderUI(generate_summary_text())
+
+      for(nm in names(input))
+        shinyjs::disable(nm)
+      shinyjs::enable("reset")
+      output$need_to_consent <- renderText("")
+      output$start_here <- renderUI(HTML(""))
+
+      shinyjs::enable("specific_outcome_selector")
+      if(input$specific_outcome_selector!="PLEASE SELECT")
+        output$specific_outcome_content <- renderUI(create_specific_coutcome_content(pfl(), input$specific_outcome_selector))
+
+      updateCheckboxInput(inputId='know_my_bg_risk', value=F)
+
+    }
+    else
+    {
+      output$need_to_consent <- renderText("Please consent to use this tool")
+    }
+  })
+
+  observeEvent(input$reset, {
+    for(i in 1:length(outcomes))
+    {
+      output[[paste0("summary_",outcomes[i])]] <- renderUI(HTML(""))
+    }
+    output$start_here <- renderUI(HTML(start_here_innerHTML))
+    output$summary_plot <- NULL
+    output$summary_desc <- NULL
+
+    updateCheckboxInput(inputId="consent",value = F)
+    for(nm in names(input))
+      shinyjs::enable(nm)
+    output$need_to_consent <- renderText("")
+
+    output$specific_outcome_content <- renderUI("")
+    shinyjs::disable("specific_outcome_selector")
+    updateTabsetPanel(session, inputId="main_panel", selected="Summary")
+  })
+
+
+  observeEvent(input$outcome_clicked,
+  {
+    updateSelectInput(
+      inputId="specific_outcome_selector",
+      selected = input$outcome_clicked
+    )
+
+    updateTabsetPanel(session, inputId="main_panel", selected="Specific outcome")
+
+  })
+
+
+  observeEvent(input$specific_outcome_selector,
+  {
+    if(input$specific_outcome_selector!="PLEASE SELECT")
+    {
+      output$specific_outcome_content <- renderUI(create_specific_coutcome_content(pfl(), input$specific_outcome_selector)) #Just in case the content might be different per outcome, we are 'creating things' on the fly
+      updateCheckboxInput(inputId="know_my_bg_risk",value=F)
+      #shinyjs::hide("div_know_my_bg_risk")
+    }
+    else
+    {
+      output$specific_outcome_content <- renderUI("")
+    }
+  })
+
+
+  observeEvent(input$specific_outcome_before,
+  {
+    outcome <- get_outcomes()[input$specific_outcome_selector]
+    risk_before <- input$specific_outcome_before/100
+    risk_after <- min(risk_before*calculate_risk(pfl(),outcome),1)
+    updateProgressBar(id="pb_specific_outcome_before",value=risk_before*100)
+    updateProgressBar(id="pb_specific_outcome_after",value=(risk_after-risk_before)*100)
+
+    # yellow <- round(risk_before*100)
+    # red <- round(risk_after*100) - yellow
+    # green <- 100 - red - yellow
+    # output$specific_outcome_icon_array <- renderUI(HTML(generate_icon_array(counts=c(yellow, red, green))))
+    # output$specific_outcome_icon_array_legend <- renderUI(HTML(generate_icon_array_legend()))
+  })
+
+}
+
+
+
+if(theme_selector==FALSE)
+{
+  shinyApp(ui, server)
+}else
+{
+  bslib::run_with_themer(shinyApp(ui, server))
+}
