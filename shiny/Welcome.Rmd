@@ -1,11 +1,9 @@
 ---
-title: "Welcome"
 output: 
   html_document: 
     #theme: null
     #highlight: null
     mathjax: null
-date: "2023-12-11"
 knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = file.path(dirname(inputFile), '/www/Welcome.html')) })
 
 ---

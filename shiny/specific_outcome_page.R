@@ -25,14 +25,14 @@ create_specific_coutcome_content <- function(profile, outcome_name)
   rr <- calculate_risk(profile ,outcome)
 
   preamble <- list(
-    h4("You have selected the following outcome:", span(class="text-success", outcome_name)),
-    h5(style="border:1px;  font-style:italic", ifelse(is.null(outcome_desc),"",outcome_desc)))
+    h5("You have selected the following outcome:", span(class="text-success", outcome_name)),
+    h6(style="color:gray", ifelse(is.null(outcome_desc),"",outcome_desc)))
 
   if(rr > 1)
   {
-    df <- data.frame(outcome=outcome_name, rr=rr, label=ifelse(rr<1,"No increase", ifelse(rr>2, ">100%", paste0("+",round(rr*100-100),"%"))))
+    df <- data.frame(outcome=outcome_name, rr=rr, label=ifelse(rr<1,"No increase", paste0("+",round(rr*100-100),"%")))
     content <- list(
-      h4("The risk ratio for this outcome is ",
+      h5("The risk ratio for this outcome is ",
          span(class="text-success", round(rr,2))),
       div(style="width:90%",
         renderPlot(
@@ -42,11 +42,11 @@ create_specific_coutcome_content <- function(profile, outcome_name)
             geom_text(aes(label=label), hjust=-0.1, vjust=0.5, color="#636363", size=7)+
             theme(axis.text=element_text(size=20))+
             geom_hline(yintercept=1, linetype="dashed", color = "orange", size=0.5)+
-            coord_flip(ylim=c(0,115))+
-            theme(axis.title=element_text(size=20,face="bold"),  plot.background = element_rect(fill = "#ffffff"),
+            coord_flip(ylim=c(0,max(115,rr*100*1.15)))+
+            theme(axis.title=element_text(size=20),  plot.background = element_rect(fill = "#ffffff"),
                   panel.background = element_rect(fill = "#ffffff", colour="#0e406a")),
              height=150)),
-      p("Interpretation: A risk ratio of 1.82 can be interpretated as a person with is using oral corticosteroid has a relative 82% increase in risk of developing (specific outcome) compared to someone who is not taking oral corticosteroids."),
+      p(paste0("Interpretation: A risk ratio of ", round(rr,2)," can be interpretated as a person with is using oral corticosteroid has a relative ",round((rr-1)*100),"% increase in risk of developing (specific outcome) compared to someone who is not taking oral corticosteroids.")),
       hr(),
       h5("If, after consulting with your care provider, you know your risk of this outcome, you can calculate the absolute increase in your risk."),
       h5(checkboxInput("know_my_bg_risk","I know my background risk*", value=T)),
@@ -55,7 +55,7 @@ create_specific_coutcome_content <- function(profile, outcome_name)
         tags$style(HTML(type="text/css", "#specific_outcome_before-label {font-weight:bold;}")),
         fluidRow(
           column(6,
-            sliderInput("specific_outcome_before",label="Select the estimated risk for a person like you who has never used oral corticosteroids:",min=0, max=100, value=bg_risk*100, width="100%")
+            sliderInput("specific_outcome_before",label="Background risk:",min=0, max=100, value=bg_risk*100, width="100%")
           ),
           column(6,
             p(style="font-style:italic; display:flex; align-items:flex-end; height:80%; font-size:75%;",

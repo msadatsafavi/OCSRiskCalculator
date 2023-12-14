@@ -69,14 +69,14 @@ ui <- fluidPage(
       fluidRow(
         column(3),
         column(3,
-          checkboxInput("consent0","I understand the purpose of this tool", width="100%"),
-          textOutput("need_to_consent0"),
-          tags$head(tags$style("#need_to_consent0{color:red;}"))
+          span(style="font-weight:bold;", checkboxInput("consent0","I understand the purpose of this tool", width="100%"))
           ),
           column(3,
             fluidRow(actionButton("make_app_visible","Take me to the app!"))
           ),
-          column(3)
+          column(3,
+                 textOutput("need_to_consent0"),
+                 tags$head(tags$style("#need_to_consent0{color:red;}")))
         )
     ),
     tabPanel("app_panel",
@@ -84,12 +84,12 @@ ui <- fluidPage(
         sidebarPanel(id="input_panel",
             sliderTextInput(
             inputId = "ocs_years",
-            label = "Number of years taking oral corticosteroids:",
+            label = "number of years taking oral corticosteroids (past or present use):",
             choices = names(time_range_map),
             selected = names(time_range_map)[5]
           )
           ,hr()
-          ,radioButtons("cur_ocs","Currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
+          ,radioButtons("cur_ocs","Are you currently taking oral corticosteroids:", choices=c("No"=0, "Yes"=1))
           ,hr()
           ,radioButtons("ocs_intensity","Generally, your oral corticosteroids use has been:", choices=c("Low"=0, "High"=1))
           ,p(id="high_dose_desc", "Oral corticosteroids use is considered high if you have received", strong("4 or more"), " prescriptions for oral corticosteroids during a year")
@@ -113,14 +113,13 @@ ui <- fluidPage(
                                selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
                                uiOutput("specific_outcome_content")),
                       tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:70vh;')),
-                      ),
+                      )
         )))),
   tags$script(src="app.js"),
   hr(),
   div(id="footer",
-      div("By NAPTIA Consultation"),
-      div(print(paste("App version: 1 (2023.12.13)")))
-      )
+    div("By NAPTIA Consultation - App version: 1 (2023.12.13)")
+  )
 )
 
 

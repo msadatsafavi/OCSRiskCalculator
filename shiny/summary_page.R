@@ -72,7 +72,8 @@ create_bar_plot <- function(profile, outcomes)
     }
     writeLines(str, tf1)
 
-    paste("<p align='left' class='text-success'>You can click on each outcome to learn more about them individually</p>
-            <p style='color:tomato'>The specific outcomes shown in the below graph are not a comprehensive list, rather comprise the more common outcomes associated with oral corticosteroid exposure"
+    paste("
+          <p><span style='color:tomato'>The specific outcomes shown in the below graph are not a comprehensive list, rather comprise the more common outcomes associated with oral corticosteroid exposure.</span>
+          <span style='font-weight:bold; color:black'>You can click on each outcome to learn more about them individually</span></p>"
           ,str)
 }
