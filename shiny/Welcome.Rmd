@@ -34,19 +34,23 @@ All the calculations in this application are based on a 2018 scientific study in
   
 
 ```{=html}
-<p><span style="color:Tomato">Warning: This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician. </span>
-               <br></p>
-               <p>For a detailed description of the tool, please refer to the About page on top</a>.</p>
+<p><span style="color:Tomato">This tool SHOULD NOT BE USED to replace a diagnostic or treatment decision made by a physician.</span> For a detailed description of how the web app works, please refer to the About page.</p>
 ```
 
 ### Terms of Use
-```{R echo=FALSE, warning=FALSE}
+```{=html}
+<DIV style="white-space: pre-wrap;width:100%; height:200px;padding:0px; overflow:auto;">
+```
+```{R echo=FALSE, warning=FALSE, results='asis'}
 library(OCSRiskCalculator)
 library(htmltools)
-pre(OCSRiskCalculator::terms_of_use())
+cat(OCSRiskCalculator::terms_of_use())
+```
+```{=html}
+</DIV">
 ```
 
 ### Before you start
-Before using this app, please click on the check box below to indicate that you consent to use this tool and understand the risk of using the tool without proper consultation with an expert. 
+Before using this app, please click on the check box below to indicate that you have read the terms of use and consent to use this tool and understand the risk of using the tool without proper consultation with an expert. 
 
 

@@ -59,8 +59,7 @@ create_specific_coutcome_content <- function(profile, outcome_name)
           ),
           column(6,
             p(style="font-style:italic; display:flex; align-items:flex-end; height:80%; font-size:75%;",
-              paste0("The starting value is set to the 10-year risk of this outcome in individuals not taking oral corticosteroids in the study by Sullivan et al ("
-                ,round(bg_risk*100),"%).")
+              paste0("The starting value (",round(bg_risk*100),"%) is the 10-year risk of this outcome in individuals not taking oral corticosteroids in the study by Sullivan et al.")
             )
           )
         ),

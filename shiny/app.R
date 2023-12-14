@@ -110,7 +110,7 @@ ui <- fluidPage(
                                selectInput("specific_outcome_selector","Please select the outcome:", c("PLEASE SELECT", names(get_outcomes()))),
                                uiOutput("specific_outcome_content")),
                       tabPanel("About", tags$iframe(src=("About.html"), style='width:100%; height:70vh;')),
-                      tabPanel("Terms", div(style="white-space: pre-wrap;width:100%; height:100%;",
+                      tabPanel("Terms", div(style="white-space: pre-wrap;width:100%; height:100vh;  padding: 15px; overflow: auto;",
                                             OCSRiskCalculator::terms_of_use()
                                         )
                               )
