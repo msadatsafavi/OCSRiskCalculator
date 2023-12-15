@@ -46,7 +46,7 @@ time_range_map <- c(
 
 
 start_here_innerHTML <- '<h1 style="color:tomato">← Start Here</h1>
-                        <p>Enter your data in the left panel and press “Calculate” after agreeing with the terms</p>'
+                        <p>Enter your data in the left panel and press “Calculate”</p>'
 
 
 ui <- fluidPage(
