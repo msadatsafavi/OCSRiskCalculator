@@ -13,7 +13,7 @@ source("specific_outcome_page.R")
 get_outcomes <- function()
 {
   outcomes <- OCSRiskCalculator:::get_outcomes()
-  outcomes[-which(outcomes %in% c("avn","tbs"))]
+  outcomes[-which(outcomes %in% c("avn","tbs","mbs"))]
 }
 
 theme_selector <- F

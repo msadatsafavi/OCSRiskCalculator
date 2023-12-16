@@ -68,7 +68,7 @@ create_bar_plot <- function(profile, outcomes)
     str <- paste(readLines(tf1), collapse="\n")
     for(outcome_name in names(outcomes))
     {
-      str <- str_replace(str, outcome_name, paste0("<a onclick='Shiny.setInputValue(\"outcome_clicked\", \"",outcome_name,"\"); return(false);' href='http://", outcome_name, ".com'>", outcome_name,"</a>"))
+      str <- str_replace(str, outcome_name, paste0("<a style='font-weight:bold'  onclick='Shiny.setInputValue(\"outcome_clicked\", \"",outcome_name,"\"); return(false);' href='http://", outcome_name, ".com'>", outcome_name,"</a>"))
     }
     writeLines(str, tf1)
 
