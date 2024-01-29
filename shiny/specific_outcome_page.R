@@ -46,7 +46,7 @@ create_specific_coutcome_content <- function(profile, outcome_name)
             theme(axis.title=element_text(size=20),  plot.background = element_rect(fill = "#ffffff"),
                   panel.background = element_rect(fill = "#ffffff", colour="#0e406a")),
              height=150)),
-      p(paste0("Interpretation: A risk ratio of ", round(rr,2)," can be interpretated as a person with is using oral corticosteroid has a relative ",round((rr-1)*100),"% increase in risk of developing (specific outcome) compared to someone who is not taking oral corticosteroids.")),
+      p(paste0("Interpretation: A risk ratio of ", round(rr,2)," can be interpretated as a person with is using oral corticosteroid has a relative ",round((rr-1)*100),"% increase in risk of developing ", tolower(outcome_name)," compared to someone who is not taking oral corticosteroids.")),
       hr(),
       h5("If, after consulting with your care provider, you know your risk of this outcome, you can calculate the absolute increase in your risk."),
       h5(checkboxInput("know_my_bg_risk","I know my background risk*", value=T)),

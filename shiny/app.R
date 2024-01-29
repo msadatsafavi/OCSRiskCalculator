@@ -119,7 +119,7 @@ ui <- fluidPage(
   tags$script(src="app.js"),
   hr(),
   div(id="footer",
-    div("By NAPTIA Consultation - App version: 1 (2023.12.13)")
+    div("By NAPTIA Consultation - App version: 1 (2024.01.28)")
   )
 )
 
