@@ -54,6 +54,9 @@ ui <- fluidPage(
 
   tags$head(tags$link(rel="stylesheet", type="text/css", href="style.css")),
 
+  tags$script('$(document).on("shiny:sessioninitialized",function(){$.get("https://api.ipify.org", function(response) {Shiny.setInputValue("getIP", response);});})'),
+  verbatimTextOutput('ip'),
+
   shinyjs::useShinyjs(),
 
   tags$head(
@@ -141,6 +144,8 @@ ui <- fluidPage(
 server <- function(input, output, session)
 {
   outcomes <- get_outcomes()
+
+  #output$ip <- reactive(input$getIP)
 
   shinyjs::disable("specific_outcome_selector") #when first started this should be disabled
 
